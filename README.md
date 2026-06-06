@@ -1,12 +1,12 @@
-# modified PyFoil
+# Modified PyFoil
 - This modification of pyfoil is intended for compiling data to train a neural network to serve as a surrogate model of Computational Fluid Dynamics simulations.
-- Neural network used to estimate drag and lift coefficients from a 2D model, given a specified angle of attack.  
-- Effective XFoil simulations were prevented by 93 files from airfoiltools.com, so the code here is modified to skip over those files to allow for successful data compilation into spreadsheets   
+- Neural network used to estimate drag and lift coefficients from a 2D model, given a specified angle of attack  
+- Effective XFoil simulations were prevented by 93 files from airfoiltools.com, so the code here is modified to skip over those files to allow for successful data compilation into spreadsheets.   
 - Reynolds number used for modified version is 1e6  
   
-original instructions below still apply  
+Original instructions below still apply  
 
-# ↓ original instructions ↓
+# ↓ ORIGINAL INSTRUCTIONS ↓
 ## PyFoil
 A Python script that pulls and parses aerodynamic data for various airfoils into a spreadsheet. Made in early 2018 (this is not the highest quality code as a result...)
 
