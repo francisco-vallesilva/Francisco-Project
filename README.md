@@ -2,8 +2,8 @@
 original instructions below still apply
 reynolds number used for modified version is 1e6
 
-# original instructions
-# PyFoil
+# ↓ original instructions ↓
+## PyFoil
 A Python script that pulls and parses aerodynamic data for various airfoils into a spreadsheet. Made in early 2018 (this is not the highest quality code as a result...)
 
 ## Details
