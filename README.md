@@ -1,5 +1,5 @@
 # modified PyFoil
-original instructions below still apply
+original instructions below still apply  
 reynolds number used for modified version is 1e6
 
 # ↓ original instructions ↓
