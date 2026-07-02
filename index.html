@@ -47,23 +47,117 @@
   }
 
   .year-badge {
-    position: absolute;
-    top: 18px;
-    left: 22px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.08em;
-    color: var(--faint);
+    color: var(--ink);
     border: 1px solid var(--line);
     border-radius: 999px;
     padding: 3px 14px;
     background: #fff;
+    flex: 0 0 auto;
   }
+  nav.topnav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.topnav .nav-inner {
+    max-width: 980px; margin: 0 auto;
+    display: flex; align-items: center; gap: 18px;
+    padding: 10px 22px;
+    overflow-x: auto;
+  }
+  nav.topnav a {
+    color: var(--muted); font-size: 14.5px; font-weight: 600;
+    white-space: nowrap; padding: 4px 2px;
+    border-bottom: 2px solid transparent;
+  }
+  nav.topnav a:hover { color: var(--ink); text-decoration: none; border-bottom-color: var(--yellow); }
+  section, header.hero { scroll-margin-top: 66px; }
+
+  .foil-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin: 24px 0 8px;
+  }
+  .foil-card {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    text-align: center;
+  }
+  .foil-card img { width: 100%; height: auto; display: block; background: #fff; }
+  .foil-card .foil-name {
+    font-weight: 700; font-size: 14px;
+    padding: 8px 8px 2px;
+    border-top: 3px solid var(--line);
+  }
+  .foil-card.c-blue .foil-name   { border-top-color: var(--blue); }
+  .foil-card.c-green .foil-name  { border-top-color: var(--green); }
+  .foil-card.c-orange .foil-name { border-top-color: var(--orange); }
+  .foil-card.c-yellow .foil-name { border-top-color: var(--yellow); }
+  .foil-card.c-gray .foil-name   { border-top-color: #d5d5d5; }
+  .foil-card .foil-meta { font-size: 12.5px; color: var(--muted); padding: 0 8px 10px; }
+
+  .model-flow { margin: 26px 0 8px; }
+  .model-flow svg { width: 100%; height: auto; display: block; }
+
+  .scatter-int { position: relative; display: inline-block; max-width: 620px; width: 100%; }
+  .scatter-int img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 12px; }
+  .scatter-int .pt {
+    position: absolute; width: 2.4%; aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%; cursor: pointer;
+  }
+  .scatter-int .pt:hover { box-shadow: 0 0 0 2.5px var(--yellow-deep); background: rgba(255,229,153,0.35); }
+
+  .exp-table-note { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  td.todo, .todo { color: var(--faint); font-style: italic; }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px; margin-top: 24px;
+  }
+  .g-tile {
+    border: 1px solid var(--line); border-radius: 12px;
+    overflow: hidden; background: #fff; text-align: center;
+  }
+  .g-tile img { width: 100%; height: auto; display: block; }
+  .g-tile .g-cap { font-size: 13px; color: var(--muted); padding: 8px; }
+  .g-tile.final { border-color: var(--yellow-deep); }
+  .g-tile.final .g-cap { font-weight: 700; color: var(--ink); background: var(--yellow); }
+  .g-tile.pending {
+    border-style: dashed; display: flex; align-items: center; justify-content: center;
+    min-height: 170px; color: var(--faint); font-size: 13.5px; font-style: italic; padding: 12px;
+  }
+
+  .video-slot {
+    position: relative; width: 100%; aspect-ratio: 16 / 9;
+    border: 2px dashed var(--blue); border-radius: 14px;
+    background: #fafcff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; margin-top: 24px;
+  }
+  .video-slot .play {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--blue); display: flex; align-items: center; justify-content: center;
+  }
+  .video-slot .play::after {
+    content: ""; display: block;
+    border-style: solid; border-width: 12px 0 12px 20px;
+    border-color: transparent transparent transparent #fff;
+    margin-left: 5px;
+  }
+  .video-slot .vs-label { color: var(--muted); font-size: 15px; font-weight: 600; }
 
   .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
   .narrow { max-width: 760px; margin-left: auto; margin-right: auto; }
 
-  header.hero { text-align: center; padding: 96px 0 24px; }
+  header.hero { text-align: center; padding: 56px 0 24px; }
   h1 {
     font-family: 'Castoro', Georgia, serif;
     font-weight: 400;
@@ -151,9 +245,13 @@
   .chip.active.c-blue   { border-color: var(--blue-deep);   background: #eef4fd; }
   .chip.active.c-green  { border-color: var(--green-deep);  background: #f0f7ec; }
   .chip.active.c-orange { border-color: var(--orange-deep); background: #fdf3e7; }
+  .chip.active.c-yellow { border-color: var(--yellow-deep); background: #fdf8e6; }
+  .chip.active.c-gray   { border-color: #555555;            background: #f2f2f2; }
   .chip.active.c-blue .dot   { background: var(--blue-deep); }
   .chip.active.c-green .dot  { background: var(--green-deep); }
   .chip.active.c-orange .dot { background: var(--orange-deep); }
+  .chip.active.c-yellow .dot { background: var(--yellow-deep); }
+  .chip.active.c-gray .dot   { background: #555555; }
   .chip.empty { cursor: default; border-style: dashed; opacity: 0.75; }
   .chip.empty .dot { background: transparent; border: 1.5px dashed var(--faint); }
   .chart-wrap { position: relative; margin-top: 10px; }
@@ -209,14 +307,25 @@
 
   @media (max-width: 640px) {
     body { font-size: 16px; }
-    header.hero { padding-top: 84px; }
+    header.hero { padding-top: 44px; }
     .explorer { padding: 16px 12px; }
   }
 </style>
 </head>
 <body>
 
-<div class="year-badge">2026</div>
+<nav class="topnav" aria-label="Page sections">
+  <div class="nav-inner">
+    <span class="year-badge">2026</span>
+    <a href="#abstract">Abstract</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#airfoil-shapes">Airfoils</a>
+    <a href="#model">Model</a>
+    <a href="#results">Results</a>
+    <a href="#experiments">Experiments</a>
+    <a href="#video">Video</a>
+  </div>
+</nav>
 
 <header class="hero container">
   <h1>Predicting Aerodynamic Coefficients from Airfoil Geometry Using Machine Learning</h1>
@@ -263,7 +372,37 @@
 <section class="container narrow" id="airfoil-shapes">
   <span class="eyebrow b">Airfoil Shapes</span>
   <h2>Five airfoils, straight from the solver</h2>
-  <p>The chart below plots exact lift coefficient values from the XFOIL output files of five airfoils in the dataset. Nothing here is smoothed or interpolated; every point is a row from the solver's CSV. Toggle airfoils on and off, and hover over a point to read its exact value.</p>
+  <p>These are five airfoils from the dataset, shown exactly as the network sees them: black silhouettes rendered from their coordinate files.</p>
+
+  <div class="foil-grid">
+    <div class="foil-card c-blue">
+      <img src="foil_fx66s196.png" alt="Silhouette of the FX66S196 airfoil, a thick cambered profile">
+      <div class="foil-name">FX66S196</div>
+      <div class="foil-meta">19.63% thick &middot; 3.71% camber</div>
+    </div>
+    <div class="foil-card c-green">
+      <img src="foil_ec863914.png" alt="Silhouette of the EC863914 airfoil, a moderately thick profile">
+      <div class="foil-name">EC863914</div>
+      <div class="foil-meta">14.29% thick &middot; 4.32% camber</div>
+    </div>
+    <div class="foil-card c-orange">
+      <img src="foil_2032c.png" alt="Silhouette of the 2032C airfoil, a thin highly cambered profile">
+      <div class="foil-name">2032C</div>
+      <div class="foil-meta">7.96% thick &middot; 6.81% camber</div>
+    </div>
+    <div class="foil-card c-yellow">
+      <img src="foil_apex16.png" alt="Silhouette of the APEX16 airfoil, a thin profile">
+      <div class="foil-name">APEX16</div>
+      <div class="foil-meta">12.95% thick &middot; 2.66% camber</div>
+    </div>
+    <div class="foil-card c-gray">
+      <img src="foil_davissm.png" alt="Silhouette of the DAVISSM airfoil, a very thin cambered profile">
+      <div class="foil-name">DAVISSM</div>
+      <div class="foil-meta">5.87% thick &middot; 5.91% camber</div>
+    </div>
+  </div>
+
+  <p style="margin-top:18px;">Below is what XFOIL computes for each of these shapes: a lift curve, meaning the lift coefficient C<sub>L</sub> at each angle of attack the solver could converge on. Every point is an exact row from that airfoil's output file. The dashed vertical line marks &alpha; = 5&deg;, the angle where each airfoil's C<sub>L</sub> is taken as its training label. An airfoil whose curve never reaches that line contributes no label, which is how 1573 airfoils became 854 training samples.</p>
 
   <div class="explorer">
     <div class="chips" id="chips" role="group" aria-label="Toggle airfoils on the chart"></div>
@@ -271,7 +410,7 @@
       <svg id="clChart" viewBox="0 0 760 460" role="img" aria-label="Lift coefficient versus angle of attack for three airfoils, plotted from exact XFOIL output"></svg>
       <div class="tooltip" id="tooltip"></div>
     </div>
-    <p class="explorer-note">Two of the five airfoils, AG11 and EBAMBINO7, produced no converged polar at this flight condition, and 2032C converged at only two angles. This is the attrition that reduced 1573 airfoils to 854 usable training samples.</p>
+    <p class="explorer-note">Only FX66S196 converged all the way through &alpha; = 5&deg;, so it is the only airfoil here that contributes a training label. The other four polars stop short of the line: XFOIL's viscous solver stopped converging on those geometries first. This attrition, repeated across the full database, is what reduced 1573 airfoils to 854 usable samples.</p>
   </div>
 
   <div class="geo-table-wrap">
@@ -295,17 +434,43 @@
   <span class="eyebrow o">Model</span>
   <h2>ResNet-18 as an aerodynamic surrogate</h2>
   <p>The surrogate is a ResNet-18 convolutional neural network with its classification head replaced by a regression head. The network takes a 224 by 224 rendering of an airfoil as input and outputs a predicted lift coefficient. Framing the problem visually, rather than feeding the network raw coordinates, lets the convolutional layers learn spatial features of the geometry, such as camber, thickness distribution, and leading edge shape, that drive aerodynamic behavior.</p>
+  <div class="model-flow" role="img" aria-label="Flow diagram: a 224 by 224 airfoil image passes through the ResNet-18 backbone, then a regression head, and outputs a predicted lift coefficient.">
+    <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="30" width="160" height="90" rx="14" fill="#fff" stroke="#B6D7A8" stroke-width="3"/>
+      <text x="88" y="66" text-anchor="middle" font-size="15" font-weight="700" fill="#363636">Airfoil image</text>
+      <text x="88" y="88" text-anchor="middle" font-size="13" fill="#6b6b6b">224 &#215; 224 px</text>
+      <path d="M176 75 L206 75" stroke="#b8962e" stroke-width="3" fill="none"/>
+      <path d="M206 75 l-9 -6 v12 z" fill="#b8962e"/>
+      <rect x="214" y="30" width="180" height="90" rx="14" fill="#fff" stroke="#F9CB9C" stroke-width="3"/>
+      <text x="304" y="66" text-anchor="middle" font-size="15" font-weight="700" fill="#363636">ResNet-18</text>
+      <text x="304" y="88" text-anchor="middle" font-size="13" fill="#6b6b6b">convolutional backbone</text>
+      <path d="M402 75 L432 75" stroke="#b8962e" stroke-width="3" fill="none"/>
+      <path d="M432 75 l-9 -6 v12 z" fill="#b8962e"/>
+      <rect x="440" y="30" width="170" height="90" rx="14" fill="#fff" stroke="#A4C2F4" stroke-width="3"/>
+      <text x="525" y="66" text-anchor="middle" font-size="15" font-weight="700" fill="#363636">Regression head</text>
+      <text x="525" y="88" text-anchor="middle" font-size="13" fill="#6b6b6b">replaces classifier</text>
+      <path d="M618 75 L648 75" stroke="#b8962e" stroke-width="3" fill="none"/>
+      <path d="M648 75 l-9 -6 v12 z" fill="#b8962e"/>
+      <rect x="656" y="30" width="96" height="90" rx="14" fill="#FFE599" stroke="#b8962e" stroke-width="2"/>
+      <text x="704" y="72" text-anchor="middle" font-size="17" font-weight="700" fill="#363636">C</text>
+      <text x="712" y="77" text-anchor="middle" font-size="12" font-weight="700" fill="#363636">L</text>
+      <text x="704" y="97" text-anchor="middle" font-size="12.5" fill="#6b6b6b">predicted lift</text>
+    </svg>
+  </div>
   <p>Training minimized regression error between the network's predictions and the XFOIL labels. The final configuration, selected after thirteen training runs, uses a dropout rate of 0.5 for regularization with a fixed random seed for reproducibility. The full training code is available in the repository linked above.</p>
 </section>
 
 <section class="container narrow" id="results">
   <span class="eyebrow y">Results</span>
   <h2>Predicted lift versus the solver's answer</h2>
-  <p>The scatter plot below is the final model's held out evaluation from training run 13. Each point compares the lift coefficient XFOIL computed for an airfoil against the lift coefficient the network predicted from its image alone. The dashed line marks perfect agreement.</p>
+  <p>The scatter plot below is the final model's held out evaluation from training run 13, and it is interactive: hover over any point to read the approximate values it represents. Each point is one airfoil the network never saw during training. Its position compares the lift coefficient XFOIL computed against the lift coefficient the network predicted from the airfoil's image alone. The dashed line marks perfect agreement.</p>
   <figure class="result">
-    <img src="scatter_run13.png" alt="Scatter plot of actual XFOIL lift versus neural network predicted lift. Points cluster tightly along the dashed perfect prediction line, with R squared equal to 0.906.">
+    <div class="scatter-int" id="scatterInt">
+      <img src="scatter_run13.png" alt="Scatter plot of actual XFOIL lift versus neural network predicted lift. Points cluster tightly along the dashed perfect prediction line, with R squared equal to 0.906.">
+      <div class="tooltip" id="scatterTip"></div>
+    </div>
     <div><span class="r2-line">R&sup2; = 0.906 on held out airfoils</span></div>
-    <figcaption>The network explains about 91 percent of the variance in solver computed lift using only an image of the geometry, at a per prediction cost of milliseconds.</figcaption>
+    <figcaption>The network explains about 91 percent of the variance in solver computed lift using only an image of the geometry, at a per prediction cost of milliseconds. Hover values are read from the plot and rounded to two decimals.</figcaption>
   </figure>
   <p style="margin-top:22px;">The training history for the same run shows why the fit holds. Both training and validation error fall steadily and settle without the validation curve turning back upward, so the network is generalizing to unseen airfoils rather than memorizing the training set.</p>
   <figure class="result">
@@ -313,6 +478,77 @@
     <figcaption>Mean squared error over 50 epochs for run 13. The gap between the curves stays small and the validation loss does not diverge, which indicates a stable, well regularized fit.</figcaption>
   </figure>
   <p style="margin-top:22px;">For a screening tool, this is the useful regime: the surrogate ranks candidate geometries reliably enough to narrow a large design space down to a shortlist, which can then be verified with full fidelity simulation.</p>
+</section>
+
+<section class="container narrow" id="experiments">
+  <span class="eyebrow o">Experiments</span>
+  <h2>Thirteen runs to the final model</h2>
+  <p>The final configuration was not the first attempt. The baseline, a fully frozen ResNet-18 backbone, reached a validation R&sup2; of only 0.37. Unfreezing the last layer group let the network adapt its features to airfoils and jumped performance immediately, and the remaining runs were a systematic sweep: weight decay first, then learning rate, then dropout, watching both validation R&sup2; and the gap between training and validation performance.</p>
+
+  <div class="explorer" style="margin-top:24px;">
+    <svg id="expChart" viewBox="0 0 760 300" role="img" aria-label="Bar chart of validation R squared across the thirteen training runs, rising from 0.37 at the baseline to 0.906 at the final run"></svg>
+  </div>
+
+  <div class="geo-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Run</th>
+          <th>Change made</th>
+          <th>Dropout</th>
+          <th>Val R&sup2;</th>
+          <th>Gap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">1</td><td>Baseline, fully frozen backbone</td><td class="mono">none</td><td class="mono">0.37</td><td class="mono none-lbl">n/a</td></tr>
+        <tr><td class="mono">2</td><td>Unfroze layer 4</td><td class="mono">none</td><td class="mono">0.8679</td><td class="mono">0.1307</td></tr>
+        <tr><td class="mono">3</td><td>Added weight decay 1e-4</td><td class="mono">none</td><td class="mono">0.853*</td><td class="mono">0.1459</td></tr>
+        <tr><td class="mono">4</td><td>Weight decay 1e-2</td><td class="mono">none</td><td class="mono">0.9011</td><td class="mono">0.0824</td></tr>
+        <tr><td class="mono">5</td><td>Weight decay 1e-1</td><td class="mono">none</td><td class="mono">0.9131</td><td class="mono">0.0697</td></tr>
+        <tr><td class="mono">6</td><td>Weight decay 5e-1</td><td class="mono">none</td><td class="mono">0.8976</td><td class="mono">0.0677</td></tr>
+        <tr><td class="mono">7</td><td>Lower learning rate, 5e-5</td><td class="mono">none</td><td class="mono">0.8151</td><td class="mono">0.1758</td></tr>
+        <tr><td class="mono">8</td><td>Higher learning rate, 2e-4</td><td class="mono">none</td><td class="mono">0.8153</td><td class="mono">0.1027</td></tr>
+        <tr><td class="mono">9</td><td>AdamW, weight decay 1e-2, added dropout</td><td class="mono">0.5</td><td class="mono">0.8884</td><td class="mono">0.0681</td></tr>
+        <tr><td class="mono">10</td><td>Lower dropout</td><td class="mono">0.3</td><td class="mono">0.8714</td><td class="mono">0.1033</td></tr>
+        <tr><td class="mono">11</td><td>Higher dropout, undertrained at 50 epochs</td><td class="mono">0.6</td><td class="mono">0.7979</td><td class="mono">0.1597</td></tr>
+        <tr><td class="mono">12</td><td>Rerun of run 9 with seeded split (seed 42)</td><td class="mono">0.6</td><td class="mono">0.8897</td><td class="mono">0.0570</td></tr>
+        <tr style="background:#fdf8e6;"><td class="mono"><strong>13</strong></td><td><strong>Final model.</strong> Run 12 config with dropout back at 0.5</td><td class="mono">0.5</td><td class="mono"><strong>0.906</strong></td><td class="mono none-lbl">final</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="exp-table-note">All runs: ResNet-18 with layer 4 unfrozen, learning rate 1e-4 unless noted, 50 epochs. Gap is training R&sup2; minus validation R&sup2;, a measure of overfitting. *Run 3's validation R&sup2; is derived from its recorded gap.</p>
+  <p style="margin-top:18px;">Two lessons stand out from the sweep. First, run-to-run variance is real: run 2 repeated an earlier configuration and landed at a noticeably different R&sup2; purely from random initialization, which is why run 12 fixed the data split with a seed before the final comparison. Second, regularization was the difference between a memorizer and a model: weight decay and dropout together cut the train-validation gap from 0.13 at run 2 to 0.057 by run 12, before the final run traded a little of that gap for the best validation score.</p>
+
+  <div class="gallery">
+    <!-- To add a run to the gallery, copy this tile and swap the image and caption:
+    <div class="g-tile">
+      <img src="scatter_runN.png" alt="Evaluation scatter for run N">
+      <div class="g-cap">Run N</div>
+    </div>
+    -->
+    <div class="g-tile pending">Run scatter plots from earlier iterations will appear here</div>
+    <div class="g-tile pending">Run scatter plots from earlier iterations will appear here</div>
+    <div class="g-tile final">
+      <img src="scatter_run13.png" alt="Evaluation scatter for run 13, the final model, with R squared 0.906">
+      <div class="g-cap">Run 13, final model</div>
+    </div>
+  </div>
+</section>
+
+<section class="container narrow" id="video">
+  <span class="eyebrow b">Video</span>
+  <h2>Project video</h2>
+  <p>A short walkthrough of the project, from the data pipeline to the trained surrogate.</p>
+  <!-- When the video is ready, replace the div below with an embed, for example:
+  <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;">
+    <iframe src="https://www.youtube.com/embed/VIDEO_ID" style="position:absolute;inset:0;width:100%;height:100%;border:0;" allowfullscreen title="Project video"></iframe>
+  </div>
+  -->
+  <div class="video-slot">
+    <div class="play" aria-hidden="true"></div>
+    <div class="vs-label">Project video coming soon</div>
+  </div>
 </section>
 
 <section class="container narrow" id="acknowledgments">
@@ -370,20 +606,26 @@
       ]
     },
     {
-      id: "ag11", label: "AG11",
-      color: "#999999", fill: "#dddddd", cls: "c-none",
-      thickness: 0.058123, camber: 0.022861,
-      points: []
+      id: "apex16", label: "APEX16",
+      color: "#b8962e", fill: "#FFE599", cls: "c-yellow",
+      thickness: 0.129513, camber: 0.026644,
+      points: [
+        [-5.0,-0.0451],[-4.5,-0.0055],[-4.0,0.0368],[-3.5,0.0787],[-2.5,0.1591],[-2.0,0.2132]
+      ]
     },
     {
-      id: "ebambino7", label: "EBAMBINO7",
-      color: "#999999", fill: "#dddddd", cls: "c-none",
-      thickness: 0.060011, camber: 0.018489,
-      points: []
+      id: "davissm", label: "DAVISSM",
+      color: "#555555", fill: "#dddddd", cls: "c-gray",
+      thickness: 0.05874, camber: 0.059076,
+      points: [
+        [-5.0,0.0572],[-4.5,0.1286],[-4.0,0.1994],[-3.5,0.2695],[-3.0,0.3391],
+        [-2.5,0.4075],[-2.0,0.4734],[-1.0,0.5989],[-0.5,0.6544],[0.0,0.7107],
+        [0.5,0.766],[1.0,0.8217],[1.5,0.8759]
+      ]
     }
   ];
 
-  var active = { fx66s196: true, ec863914: true, "2032c": true };
+  var active = { fx66s196: true, ec863914: true, "2032c": true, apex16: true, davissm: true };
 
   var svg = document.getElementById("clChart");
   var tooltip = document.getElementById("tooltip");
@@ -425,6 +667,15 @@
     }
     /* Zero line slightly darker */
     el("line", { x1: M.left, y1: sy(0), x2: M.left + pw, y2: sy(0), stroke: "#dcdcdc", "stroke-width": 1 });
+
+    /* Training label marker at alpha = 5 degrees */
+    el("line", {
+      x1: sx(5), y1: M.top, x2: sx(5), y2: M.top + ph,
+      stroke: "#b8962e", "stroke-width": 1.5, "stroke-dasharray": "6 5", opacity: 0.8
+    });
+    var lblBg = el("rect", { x: sx(5) - 74, y: M.top + 4, width: 148, height: 22, rx: 11, fill: "#FFE599" });
+    var lbl = el("text", { x: sx(5), y: M.top + 19, "text-anchor": "middle", "font-size": 12.5, "font-weight": 700, fill: "#363636" });
+    lbl.textContent = "training label \u03b1 = 5\u00b0";
 
     /* Axis titles */
     var xt = el("text", { x: M.left + pw / 2, y: H - 8, "text-anchor": "middle", "font-size": 14, fill: "#6b6b6b" });
@@ -502,6 +753,80 @@
   });
 
   draw();
+
+  /* Validation R2 progression across the 13 training runs.
+     Values from the experiment tracking sheet; run 3 derived from its
+     recorded gap; run 13 from the final evaluation plot. */
+  (function () {
+    var svg = document.getElementById("expChart");
+    if (!svg) return;
+    var RUNS = [
+      [1, 0.37], [2, 0.8679], [3, 0.853], [4, 0.9011], [5, 0.9131],
+      [6, 0.8976], [7, 0.8151], [8, 0.8153], [9, 0.8884], [10, 0.8714],
+      [11, 0.7979], [12, 0.8897], [13, 0.906]
+    ];
+    var NS = "http://www.w3.org/2000/svg";
+    var W = 760, H = 300;
+    var M = { top: 30, right: 16, bottom: 42, left: 52 };
+    var pw = W - M.left - M.right, ph = H - M.top - M.bottom;
+    var bw = pw / RUNS.length;
+    function el(name, attrs) {
+      var e = document.createElementNS(NS, name);
+      for (var k in attrs) e.setAttribute(k, attrs[k]);
+      svg.appendChild(e);
+      return e;
+    }
+    var g;
+    for (g = 0; g <= 1.0001; g += 0.25) {
+      var y = M.top + ph - g * ph;
+      el("line", { x1: M.left, y1: y, x2: M.left + pw, y2: y, stroke: "#f0f0f0" });
+      var t = el("text", { x: M.left - 8, y: y + 4, "text-anchor": "end", "font-size": 12, fill: "#9a9a9a" });
+      t.textContent = g.toFixed(2);
+    }
+    var yt = el("text", { x: 14, y: M.top + ph / 2, "text-anchor": "middle", "font-size": 13, fill: "#6b6b6b", transform: "rotate(-90 14 " + (M.top + ph / 2) + ")" });
+    yt.textContent = "Validation R\u00b2";
+    RUNS.forEach(function (r, i) {
+      var x = M.left + i * bw + bw * 0.16;
+      var h = r[1] * ph;
+      var isFinal = r[0] === 13;
+      el("rect", {
+        x: x, y: M.top + ph - h, width: bw * 0.68, height: h, rx: 5,
+        fill: isFinal ? "#FFE599" : "#A4C2F4",
+        stroke: isFinal ? "#b8962e" : "#3C78D8", "stroke-width": 1.4
+      });
+      var v = el("text", { x: x + bw * 0.34, y: M.top + ph - h - 6, "text-anchor": "middle", "font-size": 10.5, fill: "#6b6b6b" });
+      v.textContent = r[1].toFixed(2).replace(/^0/, "");
+      var xl = el("text", { x: x + bw * 0.34, y: M.top + ph + 18, "text-anchor": "middle", "font-size": 12, "font-weight": r[0] === 13 ? 700 : 400, fill: "#363636" });
+      xl.textContent = r[0];
+    });
+    var cap = el("text", { x: M.left + pw / 2, y: H - 6, "text-anchor": "middle", "font-size": 13, fill: "#6b6b6b" });
+    cap.textContent = "Training run";
+  })();
+
+  /* Interactive overlay for the run 13 evaluation scatter.
+     Point positions were located on the plot itself; values are
+     approximate (read from the plot axes, rounded to 2 decimals). */
+  (function () {
+    var host = document.getElementById("scatterInt");
+    var tip = document.getElementById("scatterTip");
+    if (!host || !tip) return;
+    var P = [[19.71,71.05,0.12,0.39],[29.62,64.29,0.34,0.55],[33.24,63.05,0.42,0.58],[35.05,66.48,0.46,0.5],[35.73,64.87,0.47,0.54],[36.56,65.8,0.49,0.51],[37.24,60.86,0.5,0.63],[37.87,62.71,0.52,0.59],[38.02,64.43,0.52,0.55],[38.29,66.39,0.53,0.5],[38.94,62.09,0.54,0.6],[39.02,63.59,0.54,0.57],[39.07,65.86,0.54,0.51],[39.6,64.94,0.56,0.53],[40.05,61.43,0.57,0.62],[40.91,62.28,0.59,0.6],[40.92,59.85,0.59,0.65],[40.96,64.36,0.59,0.55],[41.26,63.33,0.59,0.57],[41.39,61.13,0.6,0.62],[41.9,55.62,0.61,0.75],[41.92,60.0,0.61,0.65],[42.27,62.04,0.62,0.6],[42.46,58.29,0.62,0.69],[43.25,60.09,0.64,0.65],[43.39,57.01,0.64,0.72],[43.5,59.37,0.64,0.66],[43.78,60.62,0.65,0.63],[44.42,58.8,0.66,0.68],[44.67,57.49,0.67,0.71],[44.76,61.43,0.67,0.62],[44.95,55.05,0.67,0.76],[45.05,59.87,0.68,0.65],[45.12,51.71,0.68,0.84],[45.91,51.04,0.7,0.86],[46.08,58.45,0.7,0.69],[46.25,56.79,0.7,0.72],[46.34,55.87,0.71,0.74],[47.1,57.54,0.72,0.71],[47.17,58.32,0.72,0.69],[47.33,49.9,0.73,0.88],[47.51,55.41,0.73,0.76],[47.81,59.71,0.74,0.66],[47.97,57.5,0.74,0.71],[48.41,54.81,0.75,0.77],[49.81,60.29,0.78,0.64],[49.82,55.04,0.78,0.76],[49.9,52.27,0.78,0.83],[50.19,57.71,0.79,0.7],[50.37,53.35,0.79,0.8],[50.61,54.63,0.8,0.77],[50.97,52.12,0.81,0.83],[51.51,53.69,0.82,0.8],[51.53,50.58,0.82,0.87],[51.91,55.25,0.83,0.76],[52.14,51.56,0.83,0.84],[52.38,39.62,0.84,1.12],[52.48,50.19,0.84,0.88],[53.24,48.84,0.86,0.91],[53.28,51.94,0.86,0.84],[53.61,50.02,0.87,0.88],[54.22,51.08,0.88,0.86],[54.29,44.0,0.88,1.02],[54.65,48.83,0.89,0.91],[54.83,47.82,0.89,0.93],[55.33,52.29,0.9,0.83],[55.93,49.68,0.92,0.89],[55.98,47.31,0.92,0.94],[56.51,48.42,0.93,0.92],[56.76,46.61,0.93,0.96],[56.88,42.65,0.94,1.05],[57.13,49.14,0.94,0.9],[57.43,41.9,0.95,1.07],[57.78,46.07,0.96,0.97],[58.29,47.43,0.97,0.94],[58.99,48.2,0.98,0.92],[59.17,46.92,0.99,0.95],[59.5,43.54,1.0,1.03],[59.6,42.29,1.0,1.06],[60.1,47.81,1.01,0.93],[60.43,46.46,1.02,0.96],[60.49,43.76,1.02,1.02],[60.67,45.33,1.02,0.99],[60.77,41.42,1.02,1.08],[61.05,49.81,1.03,0.88],[61.56,42.75,1.04,1.05],[61.78,47.61,1.05,0.94],[62.08,44.3,1.05,1.01],[62.09,41.7,1.05,1.07],[62.2,45.82,1.05,0.98],[62.43,39.1,1.06,1.13],[62.79,40.87,1.07,1.09],[62.89,42.89,1.07,1.05],[63.33,49.05,1.08,0.9],[63.54,39.91,1.08,1.11],[63.77,41.7,1.09,1.07],[63.97,45.14,1.09,0.99],[64.04,43.55,1.1,1.03],[65.5,41.33,1.13,1.08],[65.72,42.58,1.13,1.05],[67.62,40.95,1.17,1.09],[69.04,39.23,1.21,1.13],[70.0,38.23,1.23,1.15],[70.08,39.98,1.23,1.11],[70.48,42.19,1.24,1.06],[70.71,39.0,1.24,1.14],[70.86,43.71,1.25,1.03],[70.96,37.62,1.25,1.17],[72.06,33.82,1.27,1.25],[72.76,37.33,1.29,1.17],[77.33,31.71,1.39,1.3],[78.19,28.67,1.41,1.37],[83.33,32.67,1.52,1.28],[89.43,20.57,1.65,1.56]];
+    P.forEach(function (p) {
+      var d = document.createElement("div");
+      d.className = "pt";
+      d.style.left = p[0] + "%";
+      d.style.top = p[1] + "%";
+      d.setAttribute("aria-hidden", "true");
+      d.addEventListener("mouseenter", function () {
+        tip.innerHTML = "actual \u2248 " + p[2].toFixed(2) + "<br>predicted \u2248 " + p[3].toFixed(2);
+        tip.style.left = p[0] + "%";
+        tip.style.top = p[1] + "%";
+        tip.classList.add("show");
+      });
+      d.addEventListener("mouseleave", function () { tip.classList.remove("show"); });
+      host.appendChild(d);
+    });
+  })();
 })();
 </script>
 
