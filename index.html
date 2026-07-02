@@ -551,6 +551,114 @@
   </div>
 </section>
 
+<section class="container narrow" id="try-it">
+  <span class="eyebrow o">Try It</span>
+  <h2>Run the model yourself</h2>
+  <p>Pick a held-out airfoil below. The prediction is computed live in your browser by the actual trained network — nothing is precomputed.</p>
+
+  <div id="infer-widget">
+    <select id="foil-select"></select>
+    <button id="run-inference" type="button">Predict CL</button>
+    <div id="infer-result" style="margin-top:16px;"></div>
+    <canvas id="foil-canvas" width="224" height="224" style="display:none;"></canvas>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // Confirmed real held-out airfoils with true CL at AoA=5 deg from actual XFOIL runs.
+  // hq1012 intentionally excluded: its XFOIL run has no converged result at exactly 5 deg
+  // (jumps 4.5 -> 5.5), so it doesn't meet the same standard as these four. Add it back
+  // once it's rerun and converges at 5 deg.
+  const TEST_AIRFOILS = [
+    { name: "ls417mod", image: "ls417mod.png", trueCL: 1.0291 },
+    { name: "l188root", image: "l188root.png", trueCL: 0.7858 },
+    { name: "goe225",   image: "goe225.png",   trueCL: 1.4991 },
+    { name: "geminism", image: "geminism.png", trueCL: 0.8231 },
+  ];
+
+  const IMG_SIZE = 224;
+  const MEAN = [0.485, 0.456, 0.406];
+  const STD = [0.229, 0.224, 0.225];
+
+  let session = null;
+
+  async function loadModel() {
+    session = await ort.InferenceSession.create("model.onnx");
+  }
+
+  function populateDropdown() {
+    const select = document.getElementById("foil-select");
+    TEST_AIRFOILS.forEach(function (foil, i) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = foil.name;
+      select.appendChild(opt);
+    });
+  }
+
+  function imageToTensor(img) {
+    const canvas = document.getElementById("foil-canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, IMG_SIZE, IMG_SIZE);
+    const imageData = ctx.getImageData(0, 0, IMG_SIZE, IMG_SIZE).data;
+
+    // HWC uint8 RGBA -> CHW float32 normalized
+    const data = new Float32Array(3 * IMG_SIZE * IMG_SIZE);
+    const plane = IMG_SIZE * IMG_SIZE;
+    for (let p = 0; p < plane; p++) {
+      const r = imageData[p * 4] / 255;
+      const g = imageData[p * 4 + 1] / 255;
+      const b = imageData[p * 4 + 2] / 255;
+      data[p] = (r - MEAN[0]) / STD[0];
+      data[p + plane] = (g - MEAN[1]) / STD[1];
+      data[p + plane * 2] = (b - MEAN[2]) / STD[2];
+    }
+    return new ort.Tensor("float32", data, [1, 3, IMG_SIZE, IMG_SIZE]);
+  }
+
+  async function runInference() {
+    const idx = document.getElementById("foil-select").value;
+    const foil = TEST_AIRFOILS[idx];
+    const resultEl = document.getElementById("infer-result");
+    if (!foil) {
+      resultEl.textContent = "Add airfoils to TEST_AIRFOILS first.";
+      return;
+    }
+    resultEl.textContent = "Running...";
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = foil.image;
+    await new Promise(function (resolve) { img.onload = resolve; });
+
+    const tensor = imageToTensor(img);
+    const output = await session.run({ input: tensor });
+    const predicted = output.cl_prediction.data[0];
+
+    resultEl.innerHTML =
+      "<strong>Predicted CL:</strong> " + predicted.toFixed(3) +
+      "<br><strong>True (XFOIL) CL:</strong> " + foil.trueCL.toFixed(3);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    populateDropdown();
+    loadModel().catch(function (err) {
+      document.getElementById("infer-result").textContent =
+        "Model failed to load: " + err.message;
+    });
+    document.getElementById("run-inference").addEventListener("click", function () {
+      runInference().catch(function (err) {
+        document.getElementById("infer-result").textContent = "Inference error: " + err.message;
+      });
+    });
+  });
+})();
+</script>
+
 <section class="container narrow" id="acknowledgments">
   <span class="eyebrow g">Acknowledgments</span>
   <h2>Acknowledgments</h2>
