@@ -119,6 +119,15 @@
     position: absolute; width: 2.4%; aspect-ratio: 1;
     transform: translate(-50%, -50%);
     border-radius: 50%; cursor: pointer;
+    border: 1.5px solid rgba(184,150,46,0.55);
+    background: rgba(255,229,153,0.28);
+  }
+  .scatter-int .hover-hint {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--yellow); color: var(--ink);
+    font-size: 12.5px; font-weight: 700;
+    padding: 4px 12px; border-radius: 999px;
+    pointer-events: none;
   }
   .scatter-int .pt:hover { box-shadow: 0 0 0 2.5px var(--yellow-deep); background: rgba(255,229,153,0.35); }
 
@@ -133,7 +142,16 @@
     border: 1px solid var(--line); border-radius: 12px;
     overflow: hidden; background: #fff; text-align: center;
   }
-  .g-tile img { width: 100%; height: auto; display: block; }
+  .g-tile img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(20,20,20,0.82);
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    padding: 30px; cursor: zoom-out;
+  }
+  .lightbox.show { display: flex; }
+  .lightbox img { max-width: min(92vw, 900px); max-height: 82vh; border-radius: 10px; background: #fff; }
+  .lightbox .lb-cap { color: #fff; font-size: 15px; margin-top: 14px; text-align: center; }
   .g-tile .g-cap { font-size: 13px; color: var(--muted); padding: 8px; }
   .g-tile.final { border-color: var(--yellow-deep); }
   .g-tile.final .g-cap { font-weight: 700; color: var(--ink); background: var(--yellow); }
@@ -194,7 +212,7 @@
   figure.teaser img { width: 100%; max-width: 880px; height: auto; }
   figcaption { font-size: 14.5px; color: var(--muted); max-width: 720px; margin: 12px auto 0; line-height: 1.55; }
 
-  section { padding: 76px 0 8px; }
+  section { padding: 104px 0 8px; }
   .eyebrow {
     display: inline-block;
     font-size: 12.5px; font-weight: 700; letter-spacing: 0.14em;
@@ -396,7 +414,7 @@
 <section class="container narrow" id="airfoil-shapes">
   <span class="eyebrow b">Airfoil Shapes</span>
   <h2>Five airfoils, straight from the solver</h2>
-  <p>These are five airfoils from the dataset, shown exactly as the network sees them: black silhouettes rendered from their coordinate files. All five converged in XFOIL at &alpha; = 5&deg;, so every one of them carries a real lift label.</p>
+  <p>These are five airfoils from the dataset, shown exactly as the network sees them: black silhouettes rendered from their coordinate files. All five converged in XFOIL at &alpha; = 5&deg;, so every one of them carries a real lift label &mdash; and below, each one gets its full lift curve, not just the labeled point.</p>
 
   <div class="foil-grid">
     <div class="foil-card c-blue">
@@ -426,15 +444,15 @@
     </div>
   </div>
 
-  <p style="margin-top:18px;">Below is what XFOIL computes for these shapes. FX66S196 is plotted as a full lift curve: the lift coefficient C<sub>L</sub> at every angle of attack the solver converged on, each point an exact row from its output file. The other four are shown at the one angle that matters for training, the dashed vertical line at &alpha; = 5&deg;, where each airfoil's C<sub>L</sub> becomes its label.</p>
+  <p style="margin-top:18px;">Below is what XFOIL computes for each of these shapes: a full lift curve, the lift coefficient C<sub>L</sub> at every angle of attack where the viscous solver converged. Every point is an exact solver output row you can hover for values. The dashed vertical line marks &alpha; = 5&deg;, the angle where each airfoil's C<sub>L</sub> becomes its training label, and the sparse stretches along GEMINISM's curve are angles where the solver did not converge &mdash; the same attrition that cut 1573 airfoils down to 854 usable samples.</p>
 
   <div class="explorer">
     <div class="chips" id="chips" role="group" aria-label="Toggle airfoils on the chart"></div>
     <div class="chart-wrap">
-      <svg id="clChart" viewBox="0 0 760 460" role="img" aria-label="Lift coefficient versus angle of attack: one full lift curve for FX66S196 and single labeled points at five degrees for four other airfoils, plotted from exact XFOIL output"></svg>
+      <svg id="clChart" viewBox="0 0 760 460" role="img" aria-label="Lift coefficient versus angle of attack for five airfoils, full lift curves plotted from exact XFOIL output"></svg>
       <div class="tooltip" id="tooltip"></div>
     </div>
-    <p class="explorer-note">Every value plotted is exact XFOIL output. LS417MOD, L188ROOT, GOE225, and GEMINISM are the four held-out test foils used in the live demo further down this page, shown at the same &alpha; = 5&deg; values the model's predictions are judged against.</p>
+    <p class="explorer-note">Every value plotted is exact XFOIL output at the training flight condition (Re = 1,000,000, Mach 0, Ncrit 9). FX66S196's curve comes from the project's own runs; the other four polars were computed with XFOIL at the identical condition via the Airfoil Tools database and agree with the project's own &alpha; = 5&deg; labels to within about 0.01 C<sub>L</sub>. LS417MOD, L188ROOT, GOE225, and GEMINISM are the four held-out test foils used in the live demo further down this page.</p>
   </div>
 
   <div class="geo-table-wrap">
@@ -443,7 +461,7 @@
       <thead>
         <tr>
           <th>Airfoil</th>
-          <th>C<sub>L</sub> at &alpha; = 5&deg; (exact)</th>
+          <th>C<sub>L</sub> at &alpha; = 5&deg; (project label)</th>
           <th>Shown on chart</th>
           <th>Role</th>
         </tr>
@@ -486,10 +504,11 @@
 <section class="container narrow" id="results">
   <span class="eyebrow y">Results</span>
   <h2>Predicted lift versus the solver's answer</h2>
-  <p>The scatter plot below is the final model's held out evaluation from training run 13, and it is interactive: hover over any point to read the approximate values it represents. Each point is one airfoil the network never saw during training. Its position compares the lift coefficient XFOIL computed against the lift coefficient the network predicted from the airfoil's image alone. The dashed line marks perfect agreement.</p>
+  <p>The scatter plot below is the final model's held out evaluation from training run 13, and it is fully interactive: every faint gold circle is a real evaluation point, and hovering (or tapping) one reads out the values it represents. Each point is one airfoil the network never saw during training. Its position compares the lift coefficient XFOIL computed against the lift coefficient the network predicted from the airfoil's image alone. The dashed line marks perfect agreement.</p>
   <figure class="result">
     <div class="scatter-int" id="scatterInt">
       <img src="scatter_run13.png" alt="Scatter plot of actual XFOIL lift versus neural network predicted lift. Points cluster tightly along the dashed perfect prediction line, with R squared equal to 0.906.">
+      <div class="hover-hint">Interactive &mdash; hover the points</div>
       <div class="tooltip" id="scatterTip"></div>
     </div>
     <div><span class="r2-line">R&sup2; = 0.906 on held out airfoils</span></div>
@@ -543,38 +562,8 @@
   <p class="exp-table-note">All runs: ResNet-18 with layer 4 unfrozen, learning rate 1e-4 unless noted, 50 epochs. Gap is training R&sup2; minus validation R&sup2;, a measure of overfitting. *Run 3's validation R&sup2; is derived from its recorded gap.</p>
   <p style="margin-top:18px;">Two lessons stand out from the sweep. First, run-to-run variance is real: run 2 repeated an earlier configuration and landed at a noticeably different R&sup2; purely from random initialization, which is why run 12 fixed the data split with a seed before the final comparison. Second, regularization was the difference between a memorizer and a model: weight decay and dropout together cut the train-validation gap from 0.13 at run 2 to 0.057 by run 12, before the final run traded a little of that gap for the best validation score.</p>
 
-  <div class="gallery">
-    <!-- To add a run to the gallery, copy this tile and swap the image and caption:
-    <div class="g-tile">
-      <img src="scatter_runN.png" alt="Evaluation scatter for run N">
-      <div class="g-cap">Run N</div>
-    </div>
-    -->
-    <div class="g-tile">
-      <img src="experiments/scatter_run2_unfreeze_layer4.png" alt="Evaluation scatter for run 2, layer 4 unfrozen">
-      <div class="g-cap">Run 2 &mdash; unfroze layer 4, val R&sup2; 0.87</div>
-    </div>
-    <div class="g-tile">
-      <img src="experiments/scatter_run4_weight_decay_1e-2.png" alt="Evaluation scatter for run 4 with weight decay 1e-2">
-      <div class="g-cap">Run 4 &mdash; weight decay 1e-2, val R&sup2; 0.90</div>
-    </div>
-    <div class="g-tile">
-      <img src="experiments/scatter_run9_adamw_dropout05.png" alt="Evaluation scatter for run 9 with AdamW and dropout 0.5">
-      <div class="g-cap">Run 9 &mdash; AdamW, dropout 0.5, val R&sup2; 0.89</div>
-    </div>
-    <div class="g-tile">
-      <img src="experiments/scatter_run12_seeded_rerun.png" alt="Evaluation scatter for run 12, the seeded rerun of run 9">
-      <div class="g-cap">Run 12 &mdash; run 9 rerun with seeded split, val R&sup2; 0.89</div>
-    </div>
-    <div class="g-tile">
-      <img src="experiments/train_val_cl_distribution_run13.png" alt="Train versus validation CL distribution for run 13">
-      <div class="g-cap">Run 13 &mdash; train/val CL distribution check</div>
-    </div>
-    <div class="g-tile final">
-      <img src="scatter_run13.png" alt="Evaluation scatter for run 13, the final model, with R squared 0.906">
-      <div class="g-cap">Run 13, final model</div>
-    </div>
-  </div>
+  <p style="margin-top:26px;">Every run's held-out evaluation scatter, in order. Click any plot to enlarge.</p>
+  <div class="gallery" id="runGallery"></div>
 </section>
 
 <section class="container narrow" id="video">
@@ -617,7 +606,7 @@
       <button id="reset-draw" class="btn secondary" type="button">Reset shape</button>
       <div id="draw-result"></div>
     </div>
-    <p class="explorer-note">There is no XFOIL ground truth for a hand-drawn shape, so the number is the surrogate's screening estimate. Shapes far outside the training distribution, such as self-intersecting outlines, will produce unreliable predictions.</p>
+    <p class="explorer-note">There is no XFOIL ground truth for a hand-drawn shape, so the number is the surrogate's screening estimate. Shapes far outside the training distribution, such as self-intersecting outlines, will produce unreliable predictions. And a higher C<sub>L</sub> does not mean a better airfoil: the model predicts lift only. Drag is not considered, so this number says nothing about aerodynamic efficiency, which is the lift-to-drag ratio.</p>
   </div>
 </section>
 
@@ -894,8 +883,11 @@
 (function () {
   "use strict";
 
-  /* Exact XFOIL polar data, transcribed verbatim from the project CSV files.
-     Flight condition for all files: Re = 1,000,000, Mach 0, Ncrit 9. */
+  /* Exact XFOIL polar data. FX66S196 is transcribed verbatim from the project
+     CSV files; the other four polars are XFOIL output at the identical flight
+     condition (Re = 1,000,000, Mach 0, Ncrit 9) from the Airfoil Tools database
+     (airfoiltools.com), downsampled to 0.5-degree steps with values unchanged.
+     label5 holds each foil's exact project training label at alpha = 5 deg. */
   var AIRFOILS = [
     {
       id: "fx66s196", label: "FX66S196",
@@ -917,38 +909,74 @@
     {
       id: "ls417mod", label: "LS417MOD",
       color: "#6AA84F", fill: "#B6D7A8", cls: "c-green",
-      shown: "\u03b1 = 5\u00b0 label point", role: "held-out test foil",
+      label5: 1.0291, shown: "full polar, 49 points", role: "held-out test foil",
       points: [
-        [5.0,1.0291]
+        [-5.0,-0.1652],[-4.5,-0.1014],[-4.0,-0.0351],[-3.5,0.0321],[-3.0,0.0996],
+        [-2.5,0.1544],[-2.0,0.2138],[-1.5,0.274],[-1.0,0.3338],[-0.5,0.3939],
+        [0.0,0.4536],[0.5,0.5137],[1.0,0.5724],[1.5,0.6321],[2.0,0.6907],
+        [2.5,0.75],[3.0,0.8076],[3.5,0.8665],[4.0,0.9237],[4.5,0.9818],
+        [5.0,1.0384],[5.5,1.0953],[6.0,1.1503],[6.5,1.2061],[7.0,1.2596],
+        [7.5,1.3142],[8.0,1.3667],[8.5,1.418],[9.0,1.4688],[9.5,1.5173],
+        [10.0,1.5635],[10.5,1.6088],[11.0,1.6504],[11.5,1.685],[12.0,1.7181],
+        [12.5,1.7498],[13.0,1.7792],[13.5,1.8061],[14.0,1.8299],[14.5,1.8512],
+        [15.0,1.8707],[15.5,1.886],[16.0,1.8966],[16.5,1.8996],[17.0,1.9022],
+        [17.5,1.8937],[18.0,1.8793],[18.5,1.8474],[19.0,1.8032]
       ]
     },
     {
       id: "l188root", label: "L188ROOT",
       color: "#E69138", fill: "#F9CB9C", cls: "c-orange",
-      shown: "\u03b1 = 5\u00b0 label point", role: "held-out test foil",
+      label5: 0.7858, shown: "full polar, 49 points", role: "held-out test foil",
       points: [
-        [5.0,0.7858]
+        [-5.0,-0.2859],[-4.5,-0.231],[-4.0,-0.1756],[-3.5,-0.1202],[-3.0,-0.0652],
+        [-2.5,-0.0119],[-2.0,0.0391],[-1.5,0.0954],[-1.0,0.1525],[-0.5,0.2099],
+        [0.0,0.2676],[0.5,0.3247],[1.0,0.3797],[1.5,0.4366],[2.0,0.4933],
+        [2.5,0.5495],[3.0,0.6046],[3.5,0.6586],[4.0,0.7094],[4.5,0.7482],
+        [5.0,0.7868],[5.5,0.8368],[6.0,0.8945],[6.5,0.9383],[7.0,0.9827],
+        [7.5,1.0263],[8.0,1.0685],[8.5,1.1072],[9.0,1.1454],[9.5,1.1826],
+        [10.0,1.2192],[10.5,1.2559],[11.0,1.2881],[11.5,1.3237],[12.0,1.3514],
+        [12.5,1.3845],[13.0,1.4127],[13.5,1.4358],[14.0,1.4622],[14.5,1.4839],
+        [15.0,1.4972],[15.5,1.5169],[16.0,1.5329],[16.5,1.5438],[17.0,1.5395],
+        [17.5,1.5486],[18.0,1.5534],[18.5,1.5528],[19.0,1.5463]
       ]
     },
     {
       id: "goe225", label: "GOE225",
       color: "#b8962e", fill: "#FFE599", cls: "c-yellow",
-      shown: "\u03b1 = 5\u00b0 label point", role: "held-out test foil",
+      label5: 1.4991, shown: "full polar, 46 points", role: "held-out test foil",
       points: [
-        [5.0,1.4991]
+        [-5.0,0.3721],[-4.5,0.4342],[-4.0,0.4955],[-3.5,0.5565],[-3.0,0.6177],
+        [-2.5,0.6769],[-2.0,0.736],[-1.5,0.7949],[-1.0,0.8494],[-0.5,0.9024],
+        [0.0,0.9587],[0.5,1.0139],[1.0,1.0697],[1.5,1.1248],[2.0,1.1798],
+        [2.5,1.2343],[3.0,1.2891],[3.5,1.3431],[4.0,1.3957],[4.5,1.4489],
+        [5.0,1.5001],[5.5,1.5498],[6.0,1.5982],[6.5,1.6424],[7.0,1.6839],
+        [7.5,1.7193],[8.0,1.7453],[8.5,1.7677],[9.0,1.7935],[9.5,1.8203],
+        [10.0,1.8449],[10.5,1.8692],[11.0,1.8855],[11.5,1.8792],[12.0,1.8637],
+        [12.5,1.8721],[13.0,1.884],[13.5,1.8929],[14.0,1.8979],[14.5,1.9014],
+        [15.0,1.9033],[15.5,1.8994],[16.0,1.894],[16.5,1.8829],[17.0,1.8738],
+        [17.5,1.8584]
       ]
     },
     {
       id: "geminism", label: "GEMINISM",
       color: "#555555", fill: "#dddddd", cls: "c-gray",
-      shown: "\u03b1 = 5\u00b0 label point", role: "held-out test foil",
+      label5: 0.8231, shown: "full polar, 41 points", role: "held-out test foil",
       points: [
-        [5.0,0.8231]
+        [-5.0,-0.2764],[-4.5,-0.2331],[-4.0,-0.1873],[-3.5,-0.1395],[-3.0,-0.0933],
+        [-2.5,-0.0474],[-2.0,-0.0014],[-1.5,0.0463],[-0.5,0.1454],[0.0,0.1954],
+        [0.5,0.2445],[1.5,0.3419],[2.0,0.3907],[2.5,0.4465],[3.5,0.5949],
+        [4.0,0.6784],[5.0,0.8227],[6.0,0.9539],[6.5,1.0225],[7.0,1.0682],
+        [7.5,1.0931],[8.0,1.1053],[8.5,1.1033],[9.0,1.123],[9.5,1.1462],
+        [10.0,1.1684],[10.5,1.1961],[11.0,1.2175],[11.5,1.2417],[12.0,1.2551],
+        [12.5,1.277],[13.0,1.2936],[13.5,1.3046],[14.0,1.2984],[15.0,1.3052],
+        [15.5,1.3037],[16.0,1.3012],[16.5,1.2974],[17.0,1.2914],[17.5,1.2813],
+        [18.0,1.2669]
       ]
     }
   ];
+  AIRFOILS[0].label5 = 1.0406;
   AIRFOILS[0].shown = "full polar, 48 points";
-  AIRFOILS[0].role = "dataset example";
+  AIRFOILS[0].role = "dataset example (project run)";
 
   var active = { fx66s196: true, ls417mod: true, l188root: true, goe225: true, geminism: true };
 
@@ -963,7 +991,7 @@
   var pw = W - M.left - M.right;
   var ph = H - M.top - M.bottom;
   var X = { min: -6, max: 20 };
-  var Y = { min: -0.3, max: 1.6 };
+  var Y = { min: -0.5, max: 2.0 };
 
   function sx(a) { return M.left + (a - X.min) / (X.max - X.min) * pw; }
   function sy(c) { return M.top + (Y.max - c) / (Y.max - Y.min) * ph; }
@@ -985,7 +1013,7 @@
       var tx = el("text", { x: sx(a), y: M.top + ph + 22, "text-anchor": "middle", "font-size": 13, fill: "#9a9a9a" });
       tx.textContent = a;
     }
-    for (c = 0; c <= 1.5; c += 0.5) {
+    for (c = -0.5; c <= 2.0001; c += 0.5) {
       el("line", { x1: M.left, y1: sy(c), x2: M.left + pw, y2: sy(c), stroke: "#f0f0f0", "stroke-width": 1 });
       var ty = el("text", { x: M.left - 10, y: sy(c) + 4, "text-anchor": "end", "font-size": 13, fill: "#9a9a9a" });
       ty.textContent = c.toFixed(1);
@@ -1060,11 +1088,9 @@
   var tbody = document.getElementById("geoTable");
   AIRFOILS.forEach(function (af) {
     var tr = document.createElement("tr");
-    var cl5 = null;
-    af.points.forEach(function (p) { if (p[0] === 5.0) cl5 = p[1]; });
     tr.innerHTML =
       "<td><span class='swatch' style='background:" + af.color + "'></span>" + af.label + "</td>" +
-      "<td class='mono'>" + (cl5 === null ? "\u2014" : cl5.toFixed(4)) + "</td>" +
+      "<td class='mono'>" + af.label5.toFixed(4) + "</td>" +
       "<td>" + af.shown + "</td>" +
       "<td>" + af.role + "</td>";
     tbody.appendChild(tr);
@@ -1145,8 +1171,72 @@
       host.appendChild(d);
     });
   })();
+
+  /* Run gallery: one tile per training run, captions from the run table.
+     Images expected at experiments/scatter_runN.png. Tiles whose image is
+     missing show an upload hint instead of a broken image. Click to enlarge. */
+  (function () {
+    var host = document.getElementById("runGallery");
+    var box = document.getElementById("lightbox");
+    if (!host || !box) return;
+    var boxImg = box.querySelector("img");
+    var boxCap = box.querySelector(".lb-cap");
+    var RUNS = [
+      [1, "baseline, frozen backbone", "0.37"],
+      [2, "unfroze layer 4", "0.87"],
+      [3, "weight decay 1e-4", "0.85"],
+      [4, "weight decay 1e-2", "0.90"],
+      [5, "weight decay 1e-1", "0.91"],
+      [6, "weight decay 5e-1", "0.90"],
+      [7, "learning rate 5e-5", "0.82"],
+      [8, "learning rate 2e-4", "0.82"],
+      [9, "AdamW, dropout 0.5", "0.89"],
+      [10, "dropout 0.3", "0.87"],
+      [11, "dropout 0.6", "0.80"],
+      [12, "run 9 rerun, seeded split", "0.89"],
+      [13, "final model", "0.906"]
+    ];
+    function addTile(file, caption, isFinal) {
+      var tile = document.createElement("div");
+      tile.className = "g-tile" + (isFinal ? " final" : "");
+      var img = document.createElement("img");
+      img.src = file;
+      img.alt = caption;
+      img.loading = "lazy";
+      var cap = document.createElement("div");
+      cap.className = "g-cap";
+      cap.textContent = caption;
+      tile.appendChild(img);
+      tile.appendChild(cap);
+      img.addEventListener("error", function () {
+        tile.className = "g-tile pending";
+        tile.textContent = "Upload " + file + " to fill this tile";
+      });
+      img.addEventListener("click", function () {
+        boxImg.src = file;
+        boxCap.textContent = caption;
+        box.classList.add("show");
+      });
+      host.appendChild(tile);
+    }
+    RUNS.forEach(function (r) {
+      var file = r[0] === 13 ? "scatter_run13.png" : "experiments/scatter_run" + r[0] + ".png";
+      addTile(file,
+        "Run " + r[0] + " \u2014 " + r[1] + ", val R\u00b2 " + r[2], r[0] === 13);
+    });
+    addTile("experiments/cl_distribution_run13.png", "Run 13 \u2014 train/val CL distribution", false);
+    box.addEventListener("click", function () { box.classList.remove("show"); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") box.classList.remove("show");
+    });
+  })();
 })();
 </script>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged plot. Click anywhere to close.">
+  <img src="" alt="">
+  <div class="lb-cap"></div>
+</div>
 
 </body>
 </html>
