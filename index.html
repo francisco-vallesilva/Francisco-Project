@@ -67,6 +67,10 @@
     max-width: 980px; margin: 0 auto;
     display: flex; align-items: center; gap: 18px;
     padding: 10px 22px;
+  }
+  nav.topnav .nav-links {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 18px;
     overflow-x: auto;
   }
   nav.topnav a {
@@ -78,12 +82,15 @@
   section, header.hero { scroll-margin-top: 66px; }
 
   .foil-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 14px;
     margin: 24px 0 8px;
   }
   .foil-card {
+    flex: 1 1 116px;
+    max-width: 210px;
     border: 1px solid var(--line);
     border-radius: 12px;
     overflow: hidden;
@@ -113,6 +120,13 @@
     transform: translate(-50%, -50%);
     border-radius: 50%; cursor: pointer;
   }
+  .scatter-int .hover-hint {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--yellow); color: var(--ink);
+    font-size: 12.5px; font-weight: 700;
+    padding: 4px 12px; border-radius: 999px;
+    pointer-events: none;
+  }
   .scatter-int .pt:hover { box-shadow: 0 0 0 2.5px var(--yellow-deep); background: rgba(255,229,153,0.35); }
 
   .exp-table-note { font-size: 14px; color: var(--muted); margin-top: 10px; }
@@ -126,9 +140,23 @@
     border: 1px solid var(--line); border-radius: 12px;
     overflow: hidden; background: #fff; text-align: center;
   }
-  .g-tile img { width: 100%; height: auto; display: block; }
+  .g-tile img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(20,20,20,0.82);
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    padding: 30px; cursor: zoom-out;
+  }
+  .lightbox.show { display: flex; }
+  .lightbox img { max-width: min(92vw, 900px); max-height: 82vh; border-radius: 10px; background: #fff; }
+  .lightbox .lb-cap { color: #fff; font-size: 15px; margin-top: 14px; text-align: center; }
   .g-tile .g-cap { font-size: 13px; color: var(--muted); padding: 8px; }
-  .g-tile.final { border-color: var(--yellow-deep); }
+  .g-tile.final {
+    border-color: var(--yellow-deep);
+    grid-column: 1 / -1;
+    width: 100%; max-width: 460px;
+    margin: 6px auto 0;
+  }
   .g-tile.final .g-cap { font-weight: 700; color: var(--ink); background: var(--yellow); }
   .g-tile.pending {
     border-style: dashed; display: flex; align-items: center; justify-content: center;
@@ -136,14 +164,14 @@
   }
 
   .video-slot {
-    position: relative; width: 100%; aspect-ratio: 16 / 9;
+    position: relative; width: 100%;
     border: 2px dashed var(--blue); border-radius: 14px;
     background: #fafcff;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 10px; margin-top: 24px;
+    gap: 10px; margin-top: 24px; padding: 34px 20px;
   }
   .video-slot .play {
-    width: 64px; height: 64px; border-radius: 50%;
+    width: 52px; height: 52px; border-radius: 50%;
     background: var(--blue); display: flex; align-items: center; justify-content: center;
   }
   .video-slot .play::after {
@@ -187,7 +215,7 @@
   figure.teaser img { width: 100%; max-width: 880px; height: auto; }
   figcaption { font-size: 14.5px; color: var(--muted); max-width: 720px; margin: 12px auto 0; line-height: 1.55; }
 
-  section { padding: 44px 0 8px; }
+  section { padding: 120px 0 8px; }
   .eyebrow {
     display: inline-block;
     font-size: 12.5px; font-weight: 700; letter-spacing: 0.14em;
@@ -305,6 +333,19 @@
   }
   footer .foot-year { font-weight: 700; color: var(--ink); }
 
+  /* Try-it widget + draw-your-own tool */
+  #infer-widget select {
+    font-family: inherit; font-size: 15px;
+    padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px;
+    margin-right: 10px; background: #fff; color: var(--ink);
+  }
+  button.btn { font-family: inherit; font-size: 15px; cursor: pointer; border: 0; }
+  #drawSvg { width: 100%; height: auto; display: block; touch-action: none; }
+  #drawSvg .ctrl-pt { cursor: grab; }
+  #drawSvg .ctrl-pt:active { cursor: grabbing; }
+  .draw-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+  #draw-result, #infer-result { font-size: 16px; }
+
   @media (max-width: 640px) {
     body { font-size: 16px; }
     header.hero { padding-top: 44px; }
@@ -317,13 +358,17 @@
 <nav class="topnav" aria-label="Page sections">
   <div class="nav-inner">
     <span class="year-badge">2026</span>
-    <a href="#abstract">Abstract</a>
-    <a href="#pipeline">Pipeline</a>
-    <a href="#airfoil-shapes">Airfoils</a>
-    <a href="#model">Model</a>
-    <a href="#results">Results</a>
-    <a href="#experiments">Experiments</a>
-    <a href="#video">Video</a>
+    <div class="nav-links">
+      <a href="#abstract">Abstract</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#airfoil-shapes">Airfoils</a>
+      <a href="#model">Model</a>
+      <a href="#results">Results</a>
+      <a href="#experiments">Experiments</a>
+      <a href="#video">Video</a>
+      <a href="#try-it">Try It</a>
+      <a href="#draw">Draw</a>
+    </div>
   </div>
 </nav>
 
@@ -360,7 +405,7 @@
   <span class="eyebrow g">Data Pipeline</span>
   <h2>From coordinate files to training pairs</h2>
   <p>The pipeline starts with 1573 airfoils from the UIUC Airfoil Database, each stored as a Selig format coordinate file. A plotting program renders every airfoil as a 224 by 224 pixel image, the input size expected by ResNet-18. In parallel, each geometry is run through XFOIL at a fixed flight condition (Re = 1,000,000, Mach 0) to produce a polar: lift and drag coefficients across a sweep of angles of attack.</p>
-  <p>Not every airfoil survives this process. XFOIL's viscous solver fails to converge on some geometries, and others converge at too few angles to be usable. After matching images to valid labels at an angle of attack of 5 degrees, 854 samples remain. That attrition is a normal part of working with real solver output, and a few examples of it appear in the next section.</p>
+  <p>Not every airfoil survives this process. XFOIL's viscous solver fails to converge on some geometries, and others converge at too few angles to be usable. After matching images to valid labels at an angle of attack of 5 degrees, 854 samples remain. That attrition is a normal part of working with real solver output.</p>
   <div class="stat-row">
     <div class="stat g"><div class="num">1573</div><div class="lbl">airfoils from the UIUC database</div></div>
     <div class="stat o"><div class="num">224&times;224</div><div class="lbl">px rendered geometry images</div></div>
@@ -372,57 +417,56 @@
 <section class="container narrow" id="airfoil-shapes">
   <span class="eyebrow b">Airfoil Shapes</span>
   <h2>Five airfoils, straight from the solver</h2>
-  <p>These are five airfoils from the dataset, shown exactly as the network sees them: black silhouettes rendered from their coordinate files.</p>
+  <p>These are five airfoils from the dataset, shown exactly as the network sees them: black silhouettes rendered from their coordinate files. All five converged in XFOIL at &alpha; = 5&deg;, so every one of them carries a real lift label &mdash; and below, each one gets its full lift curve, not just the labeled point.</p>
 
   <div class="foil-grid">
     <div class="foil-card c-blue">
       <img src="foil_fx66s196.png" alt="Silhouette of the FX66S196 airfoil, a thick cambered profile">
       <div class="foil-name">FX66S196</div>
-      <div class="foil-meta">19.63% thick &middot; 3.71% camber</div>
+      <div class="foil-meta">C<sub>L</sub> at 5&deg; = 1.0406</div>
     </div>
     <div class="foil-card c-green">
-      <img src="foil_ec863914.png" alt="Silhouette of the EC863914 airfoil, a moderately thick profile">
-      <div class="foil-name">EC863914</div>
-      <div class="foil-meta">14.29% thick &middot; 4.32% camber</div>
+      <img src="ls417mod.png" alt="Silhouette of the LS417MOD airfoil">
+      <div class="foil-name">LS417MOD</div>
+      <div class="foil-meta">C<sub>L</sub> at 5&deg; = 1.0291</div>
     </div>
     <div class="foil-card c-orange">
-      <img src="foil_2032c.png" alt="Silhouette of the 2032C airfoil, a thin highly cambered profile">
-      <div class="foil-name">2032C</div>
-      <div class="foil-meta">7.96% thick &middot; 6.81% camber</div>
+      <img src="l188root.png" alt="Silhouette of the L188ROOT airfoil">
+      <div class="foil-name">L188ROOT</div>
+      <div class="foil-meta">C<sub>L</sub> at 5&deg; = 0.7858</div>
     </div>
     <div class="foil-card c-yellow">
-      <img src="foil_apex16.png" alt="Silhouette of the APEX16 airfoil, a thin profile">
-      <div class="foil-name">APEX16</div>
-      <div class="foil-meta">12.95% thick &middot; 2.66% camber</div>
+      <img src="goe225.png" alt="Silhouette of the GOE225 airfoil">
+      <div class="foil-name">GOE225</div>
+      <div class="foil-meta">C<sub>L</sub> at 5&deg; = 1.4991</div>
     </div>
     <div class="foil-card c-gray">
-      <img src="foil_davissm.png" alt="Silhouette of the DAVISSM airfoil, a very thin cambered profile">
-      <div class="foil-name">DAVISSM</div>
-      <div class="foil-meta">5.87% thick &middot; 5.91% camber</div>
+      <img src="geminism.png" alt="Silhouette of the GEMINISM airfoil">
+      <div class="foil-name">GEMINISM</div>
+      <div class="foil-meta">C<sub>L</sub> at 5&deg; = 0.8231</div>
     </div>
   </div>
 
-  <p style="margin-top:18px;">Below is what XFOIL computes for each of these shapes: a lift curve, meaning the lift coefficient C<sub>L</sub> at each angle of attack the solver could converge on. Every point is an exact row from that airfoil's output file. The dashed vertical line marks &alpha; = 5&deg;, the angle where each airfoil's C<sub>L</sub> is taken as its training label. An airfoil whose curve never reaches that line contributes no label, which is how 1573 airfoils became 854 training samples.</p>
+  <p style="margin-top:18px;">Below is what XFOIL computes for each of these shapes: a full lift curve, the lift coefficient C<sub>L</sub> at every angle of attack where the viscous solver converged. Every point is an exact solver output row you can hover for values. The dashed vertical line marks &alpha; = 5&deg;, the angle where each airfoil's C<sub>L</sub> becomes its training label, and the sparse stretches along GEMINISM's curve are angles where the solver did not converge &mdash; the same attrition that cut 1573 airfoils down to 854 usable samples.</p>
 
   <div class="explorer">
     <div class="chips" id="chips" role="group" aria-label="Toggle airfoils on the chart"></div>
     <div class="chart-wrap">
-      <svg id="clChart" viewBox="0 0 760 460" role="img" aria-label="Lift coefficient versus angle of attack for three airfoils, plotted from exact XFOIL output"></svg>
+      <svg id="clChart" viewBox="0 0 760 460" role="img" aria-label="Lift coefficient versus angle of attack for five airfoils, full lift curves plotted from exact XFOIL output"></svg>
       <div class="tooltip" id="tooltip"></div>
     </div>
-    <p class="explorer-note">Only FX66S196 converged all the way through &alpha; = 5&deg;, so it is the only airfoil here that contributes a training label. The other four polars stop short of the line: XFOIL's viscous solver stopped converging on those geometries first. This attrition, repeated across the full database, is what reduced 1573 airfoils to 854 usable samples.</p>
+    <p class="explorer-note">Every value plotted is exact XFOIL output at the training flight condition (Re = 1,000,000, Mach 0, Ncrit 9). FX66S196's curve comes from the project's own runs; the other four polars were computed with XFOIL at the identical condition via the Airfoil Tools database and agree with the project's own &alpha; = 5&deg; labels to within about 0.01 C<sub>L</sub>. LS417MOD, L188ROOT, GOE225, and GEMINISM are the four held-out test foils used in the live demo further down this page.</p>
   </div>
 
   <div class="geo-table-wrap">
     <table>
-      <caption class="sr-only" style="position:absolute;left:-9999px;">Geometry and solver results for the five sample airfoils</caption>
+      <caption class="sr-only" style="position:absolute;left:-9999px;">Solver labels for the five sample airfoils</caption>
       <thead>
         <tr>
           <th>Airfoil</th>
-          <th>Thickness</th>
-          <th>Camber</th>
-          <th>Converged points</th>
-          <th>C<sub>L</sub> range (exact)</th>
+          <th>C<sub>L</sub> at &alpha; = 5&deg; (project label)</th>
+          <th>Shown on chart</th>
+          <th>Role</th>
         </tr>
       </thead>
       <tbody id="geoTable"></tbody>
@@ -463,10 +507,11 @@
 <section class="container narrow" id="results">
   <span class="eyebrow y">Results</span>
   <h2>Predicted lift versus the solver's answer</h2>
-  <p>The scatter plot below is the final model's held out evaluation from training run 13, and it is interactive: hover over any point to read the approximate values it represents. Each point is one airfoil the network never saw during training. Its position compares the lift coefficient XFOIL computed against the lift coefficient the network predicted from the airfoil's image alone. The dashed line marks perfect agreement.</p>
+  <p>The scatter plot below is the final model's held out evaluation from training run 13, and it is fully interactive: hover any of the blue points for details. Each one is a real held-out airfoil from the evaluation. Each point is one airfoil the network never saw during training. Its position compares the lift coefficient XFOIL computed against the lift coefficient the network predicted from the airfoil's image alone. The dashed line marks perfect agreement.</p>
   <figure class="result">
     <div class="scatter-int" id="scatterInt">
       <img src="scatter_run13.png" alt="Scatter plot of actual XFOIL lift versus neural network predicted lift. Points cluster tightly along the dashed perfect prediction line, with R squared equal to 0.906.">
+      <div class="hover-hint">Interactive &mdash; hover for details</div>
       <div class="tooltip" id="scatterTip"></div>
     </div>
     <div><span class="r2-line">R&sup2; = 0.906 on held out airfoils</span></div>
@@ -520,18 +565,56 @@
   <p class="exp-table-note">All runs: ResNet-18 with layer 4 unfrozen, learning rate 1e-4 unless noted, 50 epochs. Gap is training R&sup2; minus validation R&sup2;, a measure of overfitting. *Run 3's validation R&sup2; is derived from its recorded gap.</p>
   <p style="margin-top:18px;">Two lessons stand out from the sweep. First, run-to-run variance is real: run 2 repeated an earlier configuration and landed at a noticeably different R&sup2; purely from random initialization, which is why run 12 fixed the data split with a seed before the final comparison. Second, regularization was the difference between a memorizer and a model: weight decay and dropout together cut the train-validation gap from 0.13 at run 2 to 0.057 by run 12, before the final run traded a little of that gap for the best validation score.</p>
 
+  <p style="margin-top:26px;">Every run's held-out evaluation scatter, in order. Click any plot to enlarge.</p>
   <div class="gallery">
-    <!-- To add a run to the gallery, copy this tile and swap the image and caption:
+    <div class="g-tile pending">Run 1 &mdash; baseline, frozen backbone, val R&sup2; 0.37. No evaluation scatter was saved for this run.</div>
     <div class="g-tile">
-      <img src="scatter_runN.png" alt="Evaluation scatter for run N">
-      <div class="g-cap">Run N</div>
+      <img src="scatter_run2_unfreeze_layer4.png" alt="Held-out evaluation scatter for run 2" loading="lazy">
+      <div class="g-cap">Run 2 &mdash; unfroze layer 4, val R&sup2; 0.87</div>
     </div>
-    -->
-    <div class="g-tile pending">Run scatter plots from earlier iterations will appear here</div>
-    <div class="g-tile pending">Run scatter plots from earlier iterations will appear here</div>
+    <div class="g-tile">
+      <img src="scatter_run3_weight_decay.png" alt="Held-out evaluation scatter for run 3" loading="lazy">
+      <div class="g-cap">Run 3 &mdash; weight decay 1e-4, val R&sup2; 0.85</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run4_weight_decay_1e-2.png" alt="Held-out evaluation scatter for run 4" loading="lazy">
+      <div class="g-cap">Run 4 &mdash; weight decay 1e-2, val R&sup2; 0.90</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run5_weight_decay_1e-1.png" alt="Held-out evaluation scatter for run 5" loading="lazy">
+      <div class="g-cap">Run 5 &mdash; weight decay 1e-1, val R&sup2; 0.91</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run6_weight_decay_5e-1.png" alt="Held-out evaluation scatter for run 6" loading="lazy">
+      <div class="g-cap">Run 6 &mdash; weight decay 5e-1, val R&sup2; 0.90</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run7_lr5e-5_wd1e-1.png" alt="Held-out evaluation scatter for run 7" loading="lazy">
+      <div class="g-cap">Run 7 &mdash; learning rate 5e-5, val R&sup2; 0.82</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run8_lr2e-4_wd1e-1.png" alt="Held-out evaluation scatter for run 8" loading="lazy">
+      <div class="g-cap">Run 8 &mdash; learning rate 2e-4, val R&sup2; 0.82</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run9_adamw_dropout0.5_wd1e-2.png" alt="Held-out evaluation scatter for run 9" loading="lazy">
+      <div class="g-cap">Run 9 &mdash; AdamW, dropout 0.5, val R&sup2; 0.89</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run10_adamw_dropout0.3_wd1e-2.png" alt="Held-out evaluation scatter for run 10" loading="lazy">
+      <div class="g-cap">Run 10 &mdash; dropout 0.3, val R&sup2; 0.87</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run11_adamw_dropout0.6_wd1e-2.png" alt="Held-out evaluation scatter for run 11" loading="lazy">
+      <div class="g-cap">Run 11 &mdash; dropout 0.6, val R&sup2; 0.80</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run9v2_adamw_dropout0.6_wd1e-2.png" alt="Held-out evaluation scatter for run 12" loading="lazy">
+      <div class="g-cap">Run 12 &mdash; run 9 rerun, seeded split, val R&sup2; 0.89</div>
+    </div>
     <div class="g-tile final">
-      <img src="scatter_run13.png" alt="Evaluation scatter for run 13, the final model, with R squared 0.906">
-      <div class="g-cap">Run 13, final model</div>
+      <img src="scatter_run13_dropout0.5_seed42.png" alt="Held-out evaluation scatter for run 13, the final model" loading="lazy">
+      <div class="g-cap">Run 13 &mdash; final model, val R&sup2; 0.906</div>
     </div>
   </div>
 </section>
@@ -558,9 +641,25 @@
 
   <div id="infer-widget">
     <select id="foil-select"></select>
-    <button id="run-inference" type="button">Predict CL</button>
+    <button id="run-inference" class="btn" type="button">Predict CL</button>
     <div id="infer-result" style="margin-top:16px;"></div>
     <canvas id="foil-canvas" width="224" height="224" style="display:none;"></canvas>
+  </div>
+</section>
+
+<section class="container narrow" id="draw">
+  <span class="eyebrow g">Draw</span>
+  <h2>Draw your own airfoil</h2>
+  <p>Drag the control points to reshape the airfoil, then run the same trained network on your design. Blue points shape the upper surface, orange points the lower surface. Before inference, the outline is rendered as a black 224 by 224 silhouette, the same format as the training images, and fed through the exact model running in the section above.</p>
+
+  <div class="explorer">
+    <svg id="drawSvg" viewBox="0 0 600 300" role="img" aria-label="Interactive airfoil editor with draggable control points on the upper and lower surfaces"></svg>
+    <div class="draw-controls">
+      <button id="run-draw" class="btn" type="button">Predict CL</button>
+      <button id="reset-draw" class="btn secondary" type="button">Reset shape</button>
+      <div id="draw-result"></div>
+    </div>
+    <p class="explorer-note">There is no XFOIL ground truth for a hand-drawn shape, so the number is the surrogate's screening estimate. Shapes far outside the training distribution, such as self-intersecting outlines, will produce unreliable predictions. And a higher C<sub>L</sub> does not mean a better airfoil: the model predicts lift only. Drag is not considered, so this number says nothing about aerodynamic efficiency, which is the lift-to-drag ratio.</p>
   </div>
 </section>
 
@@ -584,10 +683,11 @@
   const MEAN = [0.485, 0.456, 0.406];
   const STD = [0.229, 0.224, 0.225];
 
-  let session = null;
+  let sessionPromise = null;
 
-  async function loadModel() {
-    session = await ort.InferenceSession.create("model.onnx");
+  function getSession() {
+    if (!sessionPromise) sessionPromise = ort.InferenceSession.create("model.onnx");
+    return sessionPromise;
   }
 
   function populateDropdown() {
@@ -600,10 +700,8 @@
     });
   }
 
-  function imageToTensor(img) {
-    const canvas = document.getElementById("foil-canvas");
+  function tensorFromCanvas(canvas) {
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, IMG_SIZE, IMG_SIZE);
     const imageData = ctx.getImageData(0, 0, IMG_SIZE, IMG_SIZE).data;
 
     // HWC uint8 RGBA -> CHW float32 normalized
@@ -618,6 +716,14 @@
       data[p + plane * 2] = (b - MEAN[2]) / STD[2];
     }
     return new ort.Tensor("float32", data, [1, 3, IMG_SIZE, IMG_SIZE]);
+  }
+
+  // Runs the model on whatever is currently drawn on the hidden 224x224 canvas.
+  async function predictCurrentCanvas() {
+    const session = await getSession();
+    const tensor = tensorFromCanvas(document.getElementById("foil-canvas"));
+    const output = await session.run({ input: tensor });
+    return output.cl_prediction.data[0];
   }
 
   async function runInference() {
@@ -635,18 +741,173 @@
     img.src = foil.image;
     await new Promise(function (resolve) { img.onload = resolve; });
 
-    const tensor = imageToTensor(img);
-    const output = await session.run({ input: tensor });
-    const predicted = output.cl_prediction.data[0];
+    const canvas = document.getElementById("foil-canvas");
+    canvas.getContext("2d").drawImage(img, 0, 0, IMG_SIZE, IMG_SIZE);
+    const predicted = await predictCurrentCanvas();
 
     resultEl.innerHTML =
       "<strong>Predicted CL:</strong> " + predicted.toFixed(3) +
       "<br><strong>True (XFOIL) CL:</strong> " + foil.trueCL.toFixed(3);
   }
 
+  /* ---------- Draw-your-own airfoil ---------- */
+
+  // Control point x positions along the chord (0 = leading edge, 1 = trailing edge)
+  const UPPER_X = [0.03, 0.22, 0.50, 0.78];
+  const LOWER_X = [0.05, 0.30, 0.60, 0.85];
+  const DEF_UPPER_Y = [0.050, 0.090, 0.075, 0.035];
+  const DEF_LOWER_Y = [-0.030, -0.028, -0.005, 0.008];
+  let upperY = DEF_UPPER_Y.slice();
+  let lowerY = DEF_LOWER_Y.slice();
+
+  // Closed outline: trailing edge -> upper surface -> leading edge -> lower surface -> trailing edge
+  function outlinePts() {
+    const pts = [[1, 0]];
+    for (let i = UPPER_X.length - 1; i >= 0; i--) pts.push([UPPER_X[i], upperY[i]]);
+    pts.push([0, 0]);
+    for (let j = 0; j < LOWER_X.length; j++) pts.push([LOWER_X[j], lowerY[j]]);
+    pts.push([1, 0]);
+    return pts;
+  }
+
+  // Catmull-Rom spline through the points (open at the trailing edge so it stays sharp),
+  // mapped into target coordinates by fx/fy. Used for both the SVG editor and the
+  // 224x224 model-input render so they are always pixel-identical in shape.
+  function splinePath(pts, fx, fy) {
+    let d = "M" + fx(pts[0][0]).toFixed(2) + " " + fy(pts[0][1]).toFixed(2);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[i + 2] || p2;
+      const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+      const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+      d += " C" + fx(c1x).toFixed(2) + " " + fy(c1y).toFixed(2) + " " +
+        fx(c2x).toFixed(2) + " " + fy(c2y).toFixed(2) + " " +
+        fx(p2[0]).toFixed(2) + " " + fy(p2[1]).toFixed(2);
+    }
+    return d + " Z";
+  }
+
+  // SVG editor coordinate mapping (600x300 viewBox, chord from x=60 to x=540)
+  const DSVG = { W: 600, H: 300, x0: 60, chord: 480, yc: 150 };
+  function dsx(u) { return DSVG.x0 + u * DSVG.chord; }
+  function dsy(v) { return DSVG.yc - v * DSVG.chord; }
+
+  // Render the current shape onto the hidden 224x224 canvas the way training
+  // images were made: black filled silhouette, white background, chord spanning
+  // the width with a small margin, equal aspect, centered vertically.
+  function renderShapeToModelCanvas() {
+    const canvas = document.getElementById("foil-canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, IMG_SIZE, IMG_SIZE);
+    const x0 = 12, chordPx = IMG_SIZE - 24, yc = IMG_SIZE / 2;
+    const d = splinePath(
+      outlinePts(),
+      function (u) { return x0 + u * chordPx; },
+      function (v) { return yc - v * chordPx; }
+    );
+    ctx.fillStyle = "#000000";
+    ctx.fill(new Path2D(d));
+  }
+
+  function initDrawTool() {
+    const svg = document.getElementById("drawSvg");
+    if (!svg) return;
+    const NS = "http://www.w3.org/2000/svg";
+
+    // Dashed chord reference line
+    const chordLine = document.createElementNS(NS, "line");
+    chordLine.setAttribute("x1", dsx(0)); chordLine.setAttribute("y1", dsy(0));
+    chordLine.setAttribute("x2", dsx(1)); chordLine.setAttribute("y2", dsy(0));
+    chordLine.setAttribute("stroke", "#e8e8e8");
+    chordLine.setAttribute("stroke-width", "1.5");
+    chordLine.setAttribute("stroke-dasharray", "6 5");
+    svg.appendChild(chordLine);
+
+    // Foil silhouette
+    const path = document.createElementNS(NS, "path");
+    path.setAttribute("fill", "#363636");
+    path.setAttribute("fill-opacity", "0.9");
+    svg.appendChild(path);
+
+    const handles = [];
+
+    function refresh() {
+      path.setAttribute("d", splinePath(outlinePts(), dsx, dsy));
+      handles.forEach(function (h) {
+        h.el.setAttribute("cy", dsy(h.upper ? upperY[h.i] : lowerY[h.i]));
+      });
+    }
+
+    function addHandle(upper, i) {
+      const c = document.createElementNS(NS, "circle");
+      c.setAttribute("cx", dsx(upper ? UPPER_X[i] : LOWER_X[i]));
+      c.setAttribute("cy", dsy(upper ? upperY[i] : lowerY[i]));
+      c.setAttribute("r", "9");
+      c.setAttribute("class", "ctrl-pt");
+      c.setAttribute("fill", upper ? "#3C78D8" : "#E69138");
+      c.setAttribute("stroke", "#ffffff");
+      c.setAttribute("stroke-width", "2.5");
+      svg.appendChild(c);
+      handles.push({ el: c, upper: upper, i: i });
+
+      c.addEventListener("pointerdown", function (ev) {
+        ev.preventDefault();
+        c.setPointerCapture(ev.pointerId);
+        function move(e) {
+          const box = svg.getBoundingClientRect();
+          const svgY = (e.clientY - box.top) / box.height * DSVG.H;
+          let v = (DSVG.yc - svgY) / DSVG.chord;
+          if (upper) {
+            v = Math.max(-0.05, Math.min(0.20, v));
+            upperY[i] = v;
+          } else {
+            v = Math.max(-0.20, Math.min(0.05, v));
+            lowerY[i] = v;
+          }
+          refresh();
+        }
+        function up(e) {
+          try { c.releasePointerCapture(e.pointerId); } catch (err) {}
+          c.removeEventListener("pointermove", move);
+          c.removeEventListener("pointerup", up);
+          c.removeEventListener("pointercancel", up);
+        }
+        c.addEventListener("pointermove", move);
+        c.addEventListener("pointerup", up);
+        c.addEventListener("pointercancel", up);
+      });
+    }
+
+    for (let i = 0; i < UPPER_X.length; i++) addHandle(true, i);
+    for (let j = 0; j < LOWER_X.length; j++) addHandle(false, j);
+    refresh();
+
+    document.getElementById("run-draw").addEventListener("click", function () {
+      const resEl = document.getElementById("draw-result");
+      resEl.textContent = "Running...";
+      renderShapeToModelCanvas();
+      predictCurrentCanvas().then(function (cl) {
+        resEl.innerHTML = "<strong>Predicted C<sub>L</sub>:</strong> " + cl.toFixed(3);
+      }).catch(function (err) {
+        resEl.textContent = "Inference error: " + err.message;
+      });
+    });
+
+    document.getElementById("reset-draw").addEventListener("click", function () {
+      upperY = DEF_UPPER_Y.slice();
+      lowerY = DEF_LOWER_Y.slice();
+      refresh();
+      document.getElementById("draw-result").textContent = "";
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     populateDropdown();
-    loadModel().catch(function (err) {
+    initDrawTool();
+    getSession().catch(function (err) {
       document.getElementById("infer-result").textContent =
         "Model failed to load: " + err.message;
     });
@@ -675,8 +936,11 @@
 (function () {
   "use strict";
 
-  /* Exact XFOIL polar data, transcribed verbatim from the project CSV files.
-     Flight condition for all files: Re = 1,000,000, Mach 0, Ncrit 9. */
+  /* Exact XFOIL polar data. FX66S196 is transcribed verbatim from the project
+     CSV files; the other four polars are XFOIL output at the identical flight
+     condition (Re = 1,000,000, Mach 0, Ncrit 9) from the Airfoil Tools database
+     (airfoiltools.com), downsampled to 0.5-degree steps with values unchanged.
+     label5 holds each foil's exact project training label at alpha = 5 deg. */
   var AIRFOILS = [
     {
       id: "fx66s196", label: "FX66S196",
@@ -696,44 +960,78 @@
       ]
     },
     {
-      id: "ec863914", label: "EC863914",
+      id: "ls417mod", label: "LS417MOD",
       color: "#6AA84F", fill: "#B6D7A8", cls: "c-green",
-      thickness: 0.14294, camber: 0.043175,
+      label5: 1.0291, shown: "full polar, 49 points", role: "held-out test foil",
       points: [
-        [-5.0,-0.1089],[-4.5,-0.0357],[-4.0,0.0417],[-3.5,0.1153],[-3.0,0.1827],
-        [-2.5,0.2556],[-2.0,0.3474],[-1.5,0.4037],[0.0,0.6806],[0.5,0.7509],
-        [1.0,0.7935],[1.5,0.8264],[2.0,0.8576],[3.0,0.7101]
+        [-5.0,-0.1652],[-4.5,-0.1014],[-4.0,-0.0351],[-3.5,0.0321],[-3.0,0.0996],
+        [-2.5,0.1544],[-2.0,0.2138],[-1.5,0.274],[-1.0,0.3338],[-0.5,0.3939],
+        [0.0,0.4536],[0.5,0.5137],[1.0,0.5724],[1.5,0.6321],[2.0,0.6907],
+        [2.5,0.75],[3.0,0.8076],[3.5,0.8665],[4.0,0.9237],[4.5,0.9818],
+        [5.0,1.0384],[5.5,1.0953],[6.0,1.1503],[6.5,1.2061],[7.0,1.2596],
+        [7.5,1.3142],[8.0,1.3667],[8.5,1.418],[9.0,1.4688],[9.5,1.5173],
+        [10.0,1.5635],[10.5,1.6088],[11.0,1.6504],[11.5,1.685],[12.0,1.7181],
+        [12.5,1.7498],[13.0,1.7792],[13.5,1.8061],[14.0,1.8299],[14.5,1.8512],
+        [15.0,1.8707],[15.5,1.886],[16.0,1.8966],[16.5,1.8996],[17.0,1.9022],
+        [17.5,1.8937],[18.0,1.8793],[18.5,1.8474],[19.0,1.8032]
       ]
     },
     {
-      id: "2032c", label: "2032C",
+      id: "l188root", label: "L188ROOT",
       color: "#E69138", fill: "#F9CB9C", cls: "c-orange",
-      thickness: 0.079623, camber: 0.068068,
+      label5: 0.7858, shown: "full polar, 49 points", role: "held-out test foil",
       points: [
-        [-4.5,0.0808],[-4.0,0.1543]
+        [-5.0,-0.2859],[-4.5,-0.231],[-4.0,-0.1756],[-3.5,-0.1202],[-3.0,-0.0652],
+        [-2.5,-0.0119],[-2.0,0.0391],[-1.5,0.0954],[-1.0,0.1525],[-0.5,0.2099],
+        [0.0,0.2676],[0.5,0.3247],[1.0,0.3797],[1.5,0.4366],[2.0,0.4933],
+        [2.5,0.5495],[3.0,0.6046],[3.5,0.6586],[4.0,0.7094],[4.5,0.7482],
+        [5.0,0.7868],[5.5,0.8368],[6.0,0.8945],[6.5,0.9383],[7.0,0.9827],
+        [7.5,1.0263],[8.0,1.0685],[8.5,1.1072],[9.0,1.1454],[9.5,1.1826],
+        [10.0,1.2192],[10.5,1.2559],[11.0,1.2881],[11.5,1.3237],[12.0,1.3514],
+        [12.5,1.3845],[13.0,1.4127],[13.5,1.4358],[14.0,1.4622],[14.5,1.4839],
+        [15.0,1.4972],[15.5,1.5169],[16.0,1.5329],[16.5,1.5438],[17.0,1.5395],
+        [17.5,1.5486],[18.0,1.5534],[18.5,1.5528],[19.0,1.5463]
       ]
     },
     {
-      id: "apex16", label: "APEX16",
+      id: "goe225", label: "GOE225",
       color: "#b8962e", fill: "#FFE599", cls: "c-yellow",
-      thickness: 0.129513, camber: 0.026644,
+      label5: 1.4991, shown: "full polar, 46 points", role: "held-out test foil",
       points: [
-        [-5.0,-0.0451],[-4.5,-0.0055],[-4.0,0.0368],[-3.5,0.0787],[-2.5,0.1591],[-2.0,0.2132]
+        [-5.0,0.3721],[-4.5,0.4342],[-4.0,0.4955],[-3.5,0.5565],[-3.0,0.6177],
+        [-2.5,0.6769],[-2.0,0.736],[-1.5,0.7949],[-1.0,0.8494],[-0.5,0.9024],
+        [0.0,0.9587],[0.5,1.0139],[1.0,1.0697],[1.5,1.1248],[2.0,1.1798],
+        [2.5,1.2343],[3.0,1.2891],[3.5,1.3431],[4.0,1.3957],[4.5,1.4489],
+        [5.0,1.5001],[5.5,1.5498],[6.0,1.5982],[6.5,1.6424],[7.0,1.6839],
+        [7.5,1.7193],[8.0,1.7453],[8.5,1.7677],[9.0,1.7935],[9.5,1.8203],
+        [10.0,1.8449],[10.5,1.8692],[11.0,1.8855],[11.5,1.8792],[12.0,1.8637],
+        [12.5,1.8721],[13.0,1.884],[13.5,1.8929],[14.0,1.8979],[14.5,1.9014],
+        [15.0,1.9033],[15.5,1.8994],[16.0,1.894],[16.5,1.8829],[17.0,1.8738],
+        [17.5,1.8584]
       ]
     },
     {
-      id: "davissm", label: "DAVISSM",
+      id: "geminism", label: "GEMINISM",
       color: "#555555", fill: "#dddddd", cls: "c-gray",
-      thickness: 0.05874, camber: 0.059076,
+      label5: 0.8231, shown: "full polar, 41 points", role: "held-out test foil",
       points: [
-        [-5.0,0.0572],[-4.5,0.1286],[-4.0,0.1994],[-3.5,0.2695],[-3.0,0.3391],
-        [-2.5,0.4075],[-2.0,0.4734],[-1.0,0.5989],[-0.5,0.6544],[0.0,0.7107],
-        [0.5,0.766],[1.0,0.8217],[1.5,0.8759]
+        [-5.0,-0.2764],[-4.5,-0.2331],[-4.0,-0.1873],[-3.5,-0.1395],[-3.0,-0.0933],
+        [-2.5,-0.0474],[-2.0,-0.0014],[-1.5,0.0463],[-0.5,0.1454],[0.0,0.1954],
+        [0.5,0.2445],[1.5,0.3419],[2.0,0.3907],[2.5,0.4465],[3.5,0.5949],
+        [4.0,0.6784],[5.0,0.8227],[6.0,0.9539],[6.5,1.0225],[7.0,1.0682],
+        [7.5,1.0931],[8.0,1.1053],[8.5,1.1033],[9.0,1.123],[9.5,1.1462],
+        [10.0,1.1684],[10.5,1.1961],[11.0,1.2175],[11.5,1.2417],[12.0,1.2551],
+        [12.5,1.277],[13.0,1.2936],[13.5,1.3046],[14.0,1.2984],[15.0,1.3052],
+        [15.5,1.3037],[16.0,1.3012],[16.5,1.2974],[17.0,1.2914],[17.5,1.2813],
+        [18.0,1.2669]
       ]
     }
   ];
+  AIRFOILS[0].label5 = 1.0406;
+  AIRFOILS[0].shown = "full polar, 48 points";
+  AIRFOILS[0].role = "dataset example (project run)";
 
-  var active = { fx66s196: true, ec863914: true, "2032c": true, apex16: true, davissm: true };
+  var active = { fx66s196: true, ls417mod: true, l188root: true, goe225: true, geminism: true };
 
   var svg = document.getElementById("clChart");
   var tooltip = document.getElementById("tooltip");
@@ -746,7 +1044,7 @@
   var pw = W - M.left - M.right;
   var ph = H - M.top - M.bottom;
   var X = { min: -6, max: 20 };
-  var Y = { min: -0.3, max: 1.6 };
+  var Y = { min: -0.5, max: 2.0 };
 
   function sx(a) { return M.left + (a - X.min) / (X.max - X.min) * pw; }
   function sy(c) { return M.top + (Y.max - c) / (Y.max - Y.min) * ph; }
@@ -768,7 +1066,7 @@
       var tx = el("text", { x: sx(a), y: M.top + ph + 22, "text-anchor": "middle", "font-size": 13, fill: "#9a9a9a" });
       tx.textContent = a;
     }
-    for (c = 0; c <= 1.5; c += 0.5) {
+    for (c = -0.5; c <= 2.0001; c += 0.5) {
       el("line", { x1: M.left, y1: sy(c), x2: M.left + pw, y2: sy(c), stroke: "#f0f0f0", "stroke-width": 1 });
       var ty = el("text", { x: M.left - 10, y: sy(c) + 4, "text-anchor": "end", "font-size": 13, fill: "#9a9a9a" });
       ty.textContent = c.toFixed(1);
@@ -839,24 +1137,15 @@
     chipsEl.appendChild(b);
   });
 
-  /* Geometry table */
+  /* Label table */
   var tbody = document.getElementById("geoTable");
   AIRFOILS.forEach(function (af) {
     var tr = document.createElement("tr");
-    var n = af.points.length;
-    var range = "<span class='none-lbl'>none (did not converge)</span>";
-    if (n === 1) {
-      range = af.points[0][1].toFixed(4);
-    } else if (n > 1) {
-      var cls = af.points.map(function (p) { return p[1]; });
-      range = Math.min.apply(null, cls).toFixed(4) + " to " + Math.max.apply(null, cls).toFixed(4);
-    }
     tr.innerHTML =
-      "<td><span class='swatch' style='background:" + (n ? af.color : "#cfcfcf") + "'></span>" + af.label + "</td>" +
-      "<td class='mono'>" + (af.thickness * 100).toFixed(2) + "%</td>" +
-      "<td class='mono'>" + (af.camber * 100).toFixed(2) + "%</td>" +
-      "<td class='mono'>" + n + "</td>" +
-      "<td class='mono'>" + range + "</td>";
+      "<td><span class='swatch' style='background:" + af.color + "'></span>" + af.label + "</td>" +
+      "<td class='mono'>" + af.label5.toFixed(4) + "</td>" +
+      "<td>" + af.shown + "</td>" +
+      "<td>" + af.role + "</td>";
     tbody.appendChild(tr);
   });
 
@@ -935,8 +1224,35 @@
       host.appendChild(d);
     });
   })();
+
+  /* Lightbox for the run gallery: click any plot to enlarge. */
+  (function () {
+    var box = document.getElementById("lightbox");
+    if (!box) return;
+    var boxImg = box.querySelector("img");
+    var boxCap = box.querySelector(".lb-cap");
+    var imgs = document.querySelectorAll(".gallery .g-tile img");
+    Array.prototype.forEach.call(imgs, function (img) {
+      img.addEventListener("click", function () {
+        boxImg.src = img.src;
+        boxImg.alt = img.alt;
+        var cap = img.parentElement.querySelector(".g-cap");
+        boxCap.textContent = cap ? cap.textContent : "";
+        box.classList.add("show");
+      });
+    });
+    box.addEventListener("click", function () { box.classList.remove("show"); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") box.classList.remove("show");
+    });
+  })();
 })();
 </script>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged plot. Click anywhere to close.">
+  <img src="" alt="">
+  <div class="lb-cap"></div>
+</div>
 
 </body>
 </html>
