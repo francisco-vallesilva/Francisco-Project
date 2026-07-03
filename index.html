@@ -119,8 +119,6 @@
     position: absolute; width: 2.4%; aspect-ratio: 1;
     transform: translate(-50%, -50%);
     border-radius: 50%; cursor: pointer;
-    border: 1.5px solid rgba(184,150,46,0.55);
-    background: rgba(255,229,153,0.28);
   }
   .scatter-int .hover-hint {
     position: absolute; top: 10px; right: 10px;
@@ -153,7 +151,12 @@
   .lightbox img { max-width: min(92vw, 900px); max-height: 82vh; border-radius: 10px; background: #fff; }
   .lightbox .lb-cap { color: #fff; font-size: 15px; margin-top: 14px; text-align: center; }
   .g-tile .g-cap { font-size: 13px; color: var(--muted); padding: 8px; }
-  .g-tile.final { border-color: var(--yellow-deep); }
+  .g-tile.final {
+    border-color: var(--yellow-deep);
+    grid-column: 1 / -1;
+    width: 100%; max-width: 460px;
+    margin: 6px auto 0;
+  }
   .g-tile.final .g-cap { font-weight: 700; color: var(--ink); background: var(--yellow); }
   .g-tile.pending {
     border-style: dashed; display: flex; align-items: center; justify-content: center;
@@ -161,14 +164,14 @@
   }
 
   .video-slot {
-    position: relative; width: 100%; aspect-ratio: 16 / 9;
+    position: relative; width: 100%;
     border: 2px dashed var(--blue); border-radius: 14px;
     background: #fafcff;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 10px; margin-top: 24px;
+    gap: 10px; margin-top: 24px; padding: 34px 20px;
   }
   .video-slot .play {
-    width: 64px; height: 64px; border-radius: 50%;
+    width: 52px; height: 52px; border-radius: 50%;
     background: var(--blue); display: flex; align-items: center; justify-content: center;
   }
   .video-slot .play::after {
@@ -212,7 +215,7 @@
   figure.teaser img { width: 100%; max-width: 880px; height: auto; }
   figcaption { font-size: 14.5px; color: var(--muted); max-width: 720px; margin: 12px auto 0; line-height: 1.55; }
 
-  section { padding: 104px 0 8px; }
+  section { padding: 120px 0 8px; }
   .eyebrow {
     display: inline-block;
     font-size: 12.5px; font-weight: 700; letter-spacing: 0.14em;
@@ -504,11 +507,11 @@
 <section class="container narrow" id="results">
   <span class="eyebrow y">Results</span>
   <h2>Predicted lift versus the solver's answer</h2>
-  <p>The scatter plot below is the final model's held out evaluation from training run 13, and it is fully interactive: every faint gold circle is a real evaluation point, and hovering (or tapping) one reads out the values it represents. Each point is one airfoil the network never saw during training. Its position compares the lift coefficient XFOIL computed against the lift coefficient the network predicted from the airfoil's image alone. The dashed line marks perfect agreement.</p>
+  <p>The scatter plot below is the final model's held out evaluation from training run 13, and it is fully interactive: hover any of the blue points for details. Each one is a real held-out airfoil from the evaluation. Each point is one airfoil the network never saw during training. Its position compares the lift coefficient XFOIL computed against the lift coefficient the network predicted from the airfoil's image alone. The dashed line marks perfect agreement.</p>
   <figure class="result">
     <div class="scatter-int" id="scatterInt">
       <img src="scatter_run13.png" alt="Scatter plot of actual XFOIL lift versus neural network predicted lift. Points cluster tightly along the dashed perfect prediction line, with R squared equal to 0.906.">
-      <div class="hover-hint">Interactive &mdash; hover the points</div>
+      <div class="hover-hint">Interactive &mdash; hover for details</div>
       <div class="tooltip" id="scatterTip"></div>
     </div>
     <div><span class="r2-line">R&sup2; = 0.906 on held out airfoils</span></div>
@@ -563,7 +566,57 @@
   <p style="margin-top:18px;">Two lessons stand out from the sweep. First, run-to-run variance is real: run 2 repeated an earlier configuration and landed at a noticeably different R&sup2; purely from random initialization, which is why run 12 fixed the data split with a seed before the final comparison. Second, regularization was the difference between a memorizer and a model: weight decay and dropout together cut the train-validation gap from 0.13 at run 2 to 0.057 by run 12, before the final run traded a little of that gap for the best validation score.</p>
 
   <p style="margin-top:26px;">Every run's held-out evaluation scatter, in order. Click any plot to enlarge.</p>
-  <div class="gallery" id="runGallery"></div>
+  <div class="gallery">
+    <div class="g-tile pending">Run 1 &mdash; baseline, frozen backbone, val R&sup2; 0.37. No evaluation scatter was saved for this run.</div>
+    <div class="g-tile">
+      <img src="scatter_run2_unfreeze_layer4.png" alt="Held-out evaluation scatter for run 2" loading="lazy">
+      <div class="g-cap">Run 2 &mdash; unfroze layer 4, val R&sup2; 0.87</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run3_weight_decay.png" alt="Held-out evaluation scatter for run 3" loading="lazy">
+      <div class="g-cap">Run 3 &mdash; weight decay 1e-4, val R&sup2; 0.85</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run4_weight_decay_1e-2.png" alt="Held-out evaluation scatter for run 4" loading="lazy">
+      <div class="g-cap">Run 4 &mdash; weight decay 1e-2, val R&sup2; 0.90</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run5_weight_decay_1e-1.png" alt="Held-out evaluation scatter for run 5" loading="lazy">
+      <div class="g-cap">Run 5 &mdash; weight decay 1e-1, val R&sup2; 0.91</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run6_weight_decay_5e-1.png" alt="Held-out evaluation scatter for run 6" loading="lazy">
+      <div class="g-cap">Run 6 &mdash; weight decay 5e-1, val R&sup2; 0.90</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run7_lr5e-5_wd1e-1.png" alt="Held-out evaluation scatter for run 7" loading="lazy">
+      <div class="g-cap">Run 7 &mdash; learning rate 5e-5, val R&sup2; 0.82</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run8_lr2e-4_wd1e-1.png" alt="Held-out evaluation scatter for run 8" loading="lazy">
+      <div class="g-cap">Run 8 &mdash; learning rate 2e-4, val R&sup2; 0.82</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run9_adamw_dropout0.5_wd1e-2.png" alt="Held-out evaluation scatter for run 9" loading="lazy">
+      <div class="g-cap">Run 9 &mdash; AdamW, dropout 0.5, val R&sup2; 0.89</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run10_adamw_dropout0.3_wd1e-2.png" alt="Held-out evaluation scatter for run 10" loading="lazy">
+      <div class="g-cap">Run 10 &mdash; dropout 0.3, val R&sup2; 0.87</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run11_adamw_dropout0.6_wd1e-2.png" alt="Held-out evaluation scatter for run 11" loading="lazy">
+      <div class="g-cap">Run 11 &mdash; dropout 0.6, val R&sup2; 0.80</div>
+    </div>
+    <div class="g-tile">
+      <img src="scatter_run9v2_adamw_dropout0.6_wd1e-2.png" alt="Held-out evaluation scatter for run 12" loading="lazy">
+      <div class="g-cap">Run 12 &mdash; run 9 rerun, seeded split, val R&sup2; 0.89</div>
+    </div>
+    <div class="g-tile final">
+      <img src="scatter_run13_dropout0.5_seed42.png" alt="Held-out evaluation scatter for run 13, the final model" loading="lazy">
+      <div class="g-cap">Run 13 &mdash; final model, val R&sup2; 0.906</div>
+    </div>
+  </div>
 </section>
 
 <section class="container narrow" id="video">
@@ -1172,59 +1225,22 @@
     });
   })();
 
-  /* Run gallery: one tile per training run, captions from the run table.
-     Images expected at experiments/scatter_runN.png. Tiles whose image is
-     missing show an upload hint instead of a broken image. Click to enlarge. */
+  /* Lightbox for the run gallery: click any plot to enlarge. */
   (function () {
-    var host = document.getElementById("runGallery");
     var box = document.getElementById("lightbox");
-    if (!host || !box) return;
+    if (!box) return;
     var boxImg = box.querySelector("img");
     var boxCap = box.querySelector(".lb-cap");
-    var RUNS = [
-      [1, "baseline, frozen backbone", "0.37"],
-      [2, "unfroze layer 4", "0.87"],
-      [3, "weight decay 1e-4", "0.85"],
-      [4, "weight decay 1e-2", "0.90"],
-      [5, "weight decay 1e-1", "0.91"],
-      [6, "weight decay 5e-1", "0.90"],
-      [7, "learning rate 5e-5", "0.82"],
-      [8, "learning rate 2e-4", "0.82"],
-      [9, "AdamW, dropout 0.5", "0.89"],
-      [10, "dropout 0.3", "0.87"],
-      [11, "dropout 0.6", "0.80"],
-      [12, "run 9 rerun, seeded split", "0.89"],
-      [13, "final model", "0.906"]
-    ];
-    function addTile(file, caption, isFinal) {
-      var tile = document.createElement("div");
-      tile.className = "g-tile" + (isFinal ? " final" : "");
-      var img = document.createElement("img");
-      img.src = file;
-      img.alt = caption;
-      img.loading = "lazy";
-      var cap = document.createElement("div");
-      cap.className = "g-cap";
-      cap.textContent = caption;
-      tile.appendChild(img);
-      tile.appendChild(cap);
-      img.addEventListener("error", function () {
-        tile.className = "g-tile pending";
-        tile.textContent = "Upload " + file + " to fill this tile";
-      });
+    var imgs = document.querySelectorAll(".gallery .g-tile img");
+    Array.prototype.forEach.call(imgs, function (img) {
       img.addEventListener("click", function () {
-        boxImg.src = file;
-        boxCap.textContent = caption;
+        boxImg.src = img.src;
+        boxImg.alt = img.alt;
+        var cap = img.parentElement.querySelector(".g-cap");
+        boxCap.textContent = cap ? cap.textContent : "";
         box.classList.add("show");
       });
-      host.appendChild(tile);
-    }
-    RUNS.forEach(function (r) {
-      var file = r[0] === 13 ? "scatter_run13.png" : "experiments/scatter_run" + r[0] + ".png";
-      addTile(file,
-        "Run " + r[0] + " \u2014 " + r[1] + ", val R\u00b2 " + r[2], r[0] === 13);
     });
-    addTile("experiments/cl_distribution_run13.png", "Run 13 \u2014 train/val CL distribution", false);
     box.addEventListener("click", function () { box.classList.remove("show"); });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") box.classList.remove("show");
