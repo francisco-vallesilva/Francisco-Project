@@ -382,7 +382,7 @@
 
 <header class="hero container">
   <h1>Predicting Aerodynamic Coefficients from Airfoil Geometry Using Machine Learning</h1>
-  <p class="subtitle">A neural network surrogate for computational fluid dynamics</p>
+  <p class="subtitle">A neural network surrogate model for computational fluid dynamics</p>
   <p class="authors">
     <span class="name">Francisco Valle-Silva</span>
   </p>
@@ -398,15 +398,16 @@
 
 <figure class="teaser container">
   <img src="pipeline.png" alt="Data pipeline diagram: Selig coordinate files are plotted into 224 by 224 pixel airfoil images, then paired with XFOIL polar output as CSV labels, producing 854 matched training samples.">
-  <figcaption>The data pipeline. Raw Selig coordinate files from the UIUC Airfoil Database are rendered into 224 px images, then matched with XFOIL polar output to form image and label pairs for training.</figcaption>
+  <figcaption>Raw Selig coordinate data from the UIUC Airfoil Database are rendered into 224x224 px images, then matched with XFOIL polar outputs to form image and label pairs for model training.</figcaption>
 </figure>
 
 <section class="container narrow" id="abstract">
   <span class="eyebrow y">Abstract</span>
-  <h2>A faster way to ask "how will this wing perform?"</h2>
-  <p>Designing an aircraft wing is an exercise in optimization. Engineers evaluate huge numbers of candidate airfoil shapes across many flight conditions, and the gold standard tool for those evaluations is Computational Fluid Dynamics. CFD is highly accurate, but a single simulation can take hours to days, and a full design study may require thousands of runs. That cost limits how much of the design space anyone can realistically explore.</p>
-  <p>This project builds a surrogate model: a deep neural network trained to approximate the mapping from airfoil geometry to aerodynamic performance, returning predictions in milliseconds instead of hours. The surrogate does not replace high fidelity simulation. It learns from physics based simulation data, then lets engineers rapidly screen new geometries and reserve expensive CFD runs for the most promising candidates. The same approach is actively used at institutions such as NASA for exactly this reason.</p>
-  <p>To build the training set, standardized 2D airfoil profiles were run through XFOIL, an established aerodynamic solver, to compute lift and drag coefficients. Each airfoil was rendered as an image, and a ResNet-18 convolutional neural network was trained to predict performance directly from the shape. The result is a complete pipeline from raw geometry to a trained surrogate, built from scratch, that reaches an R&sup2; of 0.906 against held out solver data.</p>
+  <h2>A faster way to estimate "how will this wing perform?"</h2>
+  <p>Designing aircraft wings requires careful optimization, because flight efficiency and performance is heavily reliant on aerodynamics. Because of this, when experimenting with wing shape designs (airfoils), engineers have to test for many variables such as lift coefficients, (C<sub>L</sub>), Angles of Attack (AoA or &alpha;), as well as speeds and altitudes, among many others. In order to get the most accurate results, engineers use a tool called Computational Fluid Dynamics (CFD). However, this simulation software is very time and resource intensive, and engineers usually have to run it thousands of times in order to complete a full design study. With each run taking anywhere from hours to days, it’s really inefficient.</p>
+  <p>What if an engineer merely needs to estimate these values while still making sure they’re reliable? That’s exactly what this project explores. While it doesn’t replace CFD’s accuracy, this project’s proposed alternative to CFD takes simulation times down to mere milliseconds, relying on a neural network that learns off of CFD. Using pregenerated airfoil datasets and their aerodynamic coefficients, the deep learning model is able to understand a shape’s underlying mappings and determine aerodynamic coefficients on its own, with decent accuracy. Once well trained, it can do these evaluations nearly instantly, allowing engineers to thoroughly evaluate designs before committing massive time and resources to CFD.</p>
+  <p>This project uses standardized profiles of 2D airfoil shapes from the UIUC Airfoil Database to gather aerodynamic data by running the shapes through a modified XFOIL, an established aerodynamic tool used in engineering, slightly altered to best cohere with this project (it kept getting stuck without modifications, modified code on GitHub). Each airfoil is then saved as a 2D image in a specific format, and along its simulated data, is fed into a ResNet-18 convolutional neural network (CNN) for it to learn off of. The end result is a surrogate model for CFD that’s created off of real data.</p>
+  <p>The motivation for this project is practicality and time-efficiency. Surrogate modeling methods are widely used at institutions such as NASA, and because of the same challenges regarding time and resource-efficient simulation, this project builds a complete pipeline from raw geometry to a trained model from scratch.</p>
 </section>
 
 <section class="container narrow" id="pipeline">
