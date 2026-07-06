@@ -413,11 +413,11 @@
 <section class="container narrow" id="pipeline">
   <span class="eyebrow g">Data Pipeline</span>
   <h2>From coordinate files to training pairs</h2>
-  <p>The pipeline starts with 1573 airfoils from the UIUC Airfoil Database, each stored as a Selig format coordinate file. A plotting program renders every airfoil as a 224 by 224 pixel image, the input size expected by ResNet-18. In parallel, each geometry is run through XFOIL at a fixed flight condition (Re = 1,000,000, Mach 0) to produce a polar: lift and drag coefficients across a sweep of angles of attack.</p>
-  <p>Not every airfoil survives this process. XFOIL's viscous solver fails to converge on some geometries, and others converge at too few angles to be usable. After matching images to valid labels at an angle of attack of 5 degrees, 854 samples remain. That attrition is a normal part of working with real solver output.</p>
+  <p><p>It begins with 1573 airfoils from the UIUC Airfoil Database, picked off of the Reynolds number 1e6, which is typically used for small aircraft, gliders, or drones. The airfoils are stored as coordinate files in the Selig format. The airfoils are plotted in a 224x224 px format so they’re usable by the ResNet-18 model, and also run through XFOIL to get datasets for each angle of attack (polars).</p>
+  <p>XFOIL’s solver sometimes fails to converge on some geometries, and some converge at too few angles, so not all airfoils are usable. Further filtering the airfoil list to apply to specific angles of attack, 854 samples remained, which is acceptable for working with a real solver’s outputs, because all of those 854 samples have enough data at one angle of attack (5 degrees) to train the model, meaning it’s very scalable.</p>
   <div class="stat-row">
     <div class="stat g"><div class="num">1573</div><div class="lbl">airfoils from the UIUC database</div></div>
-    <div class="stat o"><div class="num">224&times;224</div><div class="lbl">px rendered geometry images</div></div>
+    <div class="stat o"><div class="num">224&times;224</div><div class="lbl">resolution of rendered geometry images</div></div>
     <div class="stat b"><div class="num">854</div><div class="lbl">matched image and label pairs</div></div>
     <div class="stat y"><div class="num">5&deg;</div><div class="lbl">angle of attack for training labels</div></div>
   </div>
@@ -426,7 +426,7 @@
 <section class="container narrow" id="airfoil-shapes">
   <span class="eyebrow b">Airfoil Shapes</span>
   <h2>Five airfoils, straight from the solver</h2>
-  <p>These are five airfoils from the dataset, shown exactly as the network sees them: black silhouettes rendered from their coordinate files. All five converged in XFOIL at &alpha; = 5&deg;, so every one of them carries a real lift label &mdash; and below, each one gets its full lift curve, not just the labeled point.</p>
+  <p>These are five airfoils from the dataset, rendered exactly as the neural network sees them: black silhouettes rendered from their coordinate files. All five were converged in XFOIL at &alpha; = 5&deg;, so each has real lift data, and each gets its full lift curve, not just the labeled point, as seen below.</p>
 
   <div class="foil-grid">
     <div class="foil-card c-blue">
@@ -456,7 +456,7 @@
     </div>
   </div>
 
-  <p style="margin-top:18px;">Below is what XFOIL computes for each of these shapes: a full lift curve, the lift coefficient C<sub>L</sub> at every angle of attack where the viscous solver converged. Every point is an exact solver output row you can hover for values. The dashed vertical line marks &alpha; = 5&deg;, the angle where each airfoil's C<sub>L</sub> becomes its training label, and the sparse stretches along GEMINISM's curve are angles where the solver did not converge &mdash; the same attrition that cut 1573 airfoils down to 854 usable samples.</p>
+  <p style="margin-top:18px;">This is what XFOIL computes for each of these shapes: a full lift curve, the lift coefficient C<sub>L</sub> at every angle of attack where the viscous solver converged. Every point is an exact solver output row you can hover for values. The dashed vertical line marks &alpha; = 5&deg;, the angle where each airfoil's C<sub>L</sub> becomes its training label, and the sparse stretches along GEMINISM's curve are angles where the solver did not converge (this same result is what cut 1573 airfoils down to 854 usable samples).</p>
 
   <div class="explorer">
     <div class="chips" id="chips" role="group" aria-label="Toggle airfoils on the chart"></div>
@@ -464,7 +464,7 @@
       <svg id="clChart" viewBox="0 0 760 460" role="img" aria-label="Lift coefficient versus angle of attack for five airfoils, full lift curves plotted from exact XFOIL output"></svg>
       <div class="tooltip" id="tooltip"></div>
     </div>
-    <p class="explorer-note">Every value plotted is exact XFOIL output at the training flight condition (Re = 1,000,000, Mach 0, Ncrit 9). FX66S196's curve comes from the project's own runs; the other four polars were computed with XFOIL at the identical condition via the Airfoil Tools database and agree with the project's own &alpha; = 5&deg; labels to within about 0.01 C<sub>L</sub>. LS417MOD, L188ROOT, GOE225, and GEMINISM are the four held-out test foils used in the live demo further down this page.</p>
+    <p class="explorer-note">Every value plotted is exact XFOIL output at the training flight condition (Re = 1,000,000, Mach 0, Ncrit 9). FX66S196's curve comes from the project's own runs; the other four polars were computed with XFOIL at the identical condition via the Airfoil Tools database and agree with the project's own &alpha; = 5&deg; labels to within about 0.01 C<sub>L</sub>. LS417MOD, L188ROOT, GOE225, and GEMINISM are the four held-out test foils used in the live demo further down.</p>
   </div>
 
   <div class="geo-table-wrap">
@@ -516,7 +516,7 @@
 <section class="container narrow" id="results">
   <span class="eyebrow y">Results</span>
   <h2>Predicted lift versus the solver's answer</h2>
-  <p>The scatter plot below is the final model's held out evaluation from training run 13, and it is fully interactive: hover any of the blue points for details. Each one is a real held-out airfoil from the evaluation. Each point is one airfoil the network never saw during training. Its position compares the lift coefficient XFOIL computed against the lift coefficient the network predicted from the airfoil's image alone. The dashed line marks perfect agreement.</p>
+  <p>The scatter plot below is the final model's held out evaluation from training run 13, and it's fully interactive: hover any of the blue points for details. Each one is a real held-out airfoil from the evaluation. Each point is one airfoil the network never saw during training. Its position compares the lift coefficient XFOIL computed against the lift coefficient the network predicted from the airfoil's image alone. The red dashed line marks what a perfect prediction is.</p>
   <figure class="result">
     <div class="scatter-int" id="scatterInt">
       <img src="scatter_run13.png" alt="Scatter plot of actual XFOIL lift versus neural network predicted lift. Points cluster tightly along the dashed perfect prediction line, with R squared equal to 0.906.">
@@ -526,12 +526,12 @@
     <div><span class="r2-line">R&sup2; = 0.906 on held out airfoils</span></div>
     <figcaption>The network explains about 91 percent of the variance in solver computed lift using only an image of the geometry, at a per prediction cost of milliseconds. Hover values are read from the plot and rounded to two decimals.</figcaption>
   </figure>
-  <p style="margin-top:22px;">The training history for the same run shows why the fit holds. Both training and validation error fall steadily and settle without the validation curve turning back upward, so the network is generalizing to unseen airfoils rather than memorizing the training set.</p>
+  <p style="margin-top:22px;">The training history for the same run shows why the fit holds. Both training and validation error fall steadily and settle without the validation curve turning back upward, so the network is generalizing to unseen airfoils rather than memorizing the training set. This chart along the scatter plot above are what determined run 13's success compared to previous training runs.</p>
   <figure class="result">
     <img src="loss_run13.png" alt="Training and validation mean squared error over 50 epochs. Both curves decline and flatten, with validation loss settling near zero and staying below training loss.">
     <figcaption>Mean squared error over 50 epochs for run 13. The gap between the curves stays small and the validation loss does not diverge, which indicates a stable, well regularized fit.</figcaption>
   </figure>
-  <p style="margin-top:22px;">For a screening tool, this is the useful regime: the surrogate ranks candidate geometries reliably enough to narrow a large design space down to a shortlist, which can then be verified with full fidelity simulation.</p>
+  <p style="margin-top:22px;">For a screening tool, this is the useful regime: the surrogate ranks candidate geometries reliably enough to narrow a large design space down to a short list, which can then be verified with a full fidelity simulation.</p>
 </section>
 
 <section class="container narrow" id="experiments">
@@ -572,11 +572,11 @@
     </table>
   </div>
   <p class="exp-table-note">All runs: ResNet-18 with layer 4 unfrozen, learning rate 1e-4 unless noted, 50 epochs. Gap is training R&sup2; minus validation R&sup2;, a measure of overfitting. *Run 3's validation R&sup2; is derived from its recorded gap.</p>
-  <p style="margin-top:18px;">Two lessons stand out from the sweep. First, run-to-run variance is real: run 2 repeated an earlier configuration and landed at a noticeably different R&sup2; purely from random initialization, which is why run 12 fixed the data split with a seed before the final comparison. Second, regularization was the difference between a memorizer and a model: weight decay and dropout together cut the train-validation gap from 0.13 at run 2 to 0.057 by run 12, before the final run traded a little of that gap for the best validation score.</p>
+  <p style="margin-top:18px;">Two lessons stood out from the sweep. First, run-to-run variance was very obvious; run 2 repeated an earlier configuration and landed at a noticeably different R&sup2; purely from random initialization, which is why run 12 fixed the data split with a seed before the final comparison. Run 5 had a similar R&sup2; to run 13, but the final training run was more consistent, and run 5 could have had completely different result by pure chance. Second, regularization was the difference between a memorizer and a model: weight decay and dropout together cut the train-validation gap from 0.13 at run 2 to 0.057 by run 12, before the final run traded a little of that gap for the best validation score.</p>
 
   <p style="margin-top:26px;">Every run's held-out evaluation scatter, in order. Click any plot to enlarge.</p>
   <div class="gallery">
-    <div class="g-tile pending">Run 1 &mdash; baseline, frozen backbone, val R&sup2; 0.37. No evaluation scatter was saved for this run.</div>
+    <div class="g-tile pending">Run 1: baseline, frozen backbone, val R&sup2; 0.37. No evaluation scatter was saved for this run.</div>
     <div class="g-tile">
       <img src="scatter_run2_unfreeze_layer4.png" alt="Held-out evaluation scatter for run 2" loading="lazy">
       <div class="g-cap">Run 2 &mdash; unfroze layer 4, val R&sup2; 0.87</div>
@@ -646,7 +646,7 @@
 <section class="container narrow" id="try-it">
   <span class="eyebrow o">Try It</span>
   <h2>Run the model yourself</h2>
-  <p>Pick a held-out airfoil below. The prediction is computed live in your browser by the actual trained network — nothing is precomputed.</p>
+  <p>Pick a held-out airfoil below. The prediction is computed live in your browser by the actual trained network. Nothing is precomputed.</p>
 
   <div id="infer-widget">
     <select id="foil-select"></select>
@@ -668,7 +668,7 @@
       <button id="reset-draw" class="btn secondary" type="button">Reset shape</button>
       <div id="draw-result"></div>
     </div>
-    <p class="explorer-note">There is no XFOIL ground truth for a hand-drawn shape, so the number is the surrogate's screening estimate. Shapes far outside the training distribution, such as self-intersecting outlines, will produce unreliable predictions. And a higher C<sub>L</sub> does not mean a better airfoil: the model predicts lift only. Drag is not considered, so this number says nothing about aerodynamic efficiency, which is the lift-to-drag ratio.</p>
+    <p class="explorer-note">There is no XFOIL ground truth for a hand-drawn shape, so the number is the surrogate's screening estimate. Erratic shapes that are vastly different from typical airfoil shapes, such as those with self-intersecting outlines, will produce unreliable predictions. And a higher C<sub>L</sub> does not mean a better airfoil: the model predicts lift only. Drag and conditions are not considered, so this number says nothing about aerodynamic efficiency, which is the lift-to-drag ratio.</p>
   </div>
 </section>
 
@@ -937,7 +937,7 @@
 
 <footer>
   <div class="container">
-    <p><span class="foot-year">2026</span> &middot; Francisco Valle-Silva <span style="font-size:12px;color:var(--muted);">&middot; rev 8</span></p>
+    <p><span class="foot-year">2026</span> &middot; Francisco Valle-Silva</p>
   </div>
 </footer>
 
