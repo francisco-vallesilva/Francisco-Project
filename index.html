@@ -369,7 +369,6 @@
     <div class="nav-links">
       <a href="#abstract">Abstract</a>
       <a href="#pipeline">Pipeline</a>
-      <a href="#airfoil-shapes">Airfoils</a>
       <a href="#model">Model</a>
       <a href="#results">Results</a>
       <a href="#experiments">Experiments</a>
@@ -386,13 +385,13 @@
   <p class="authors">
     <span class="name">Francisco Valle-Silva</span>
   </p>
-  <p class="affil">Mentored by <a href="https://research.gatech.edu/people/benjamin-joffe" target="_blank" rel="noopener">Benjamin Joffe</a>, Georgia Tech Research Institute</p>
+  <p class="affil">Mentored by <a href="https://bjoffe.com" target="_blank" rel="noopener">Benjamin Joffe</a>, Georgia Tech</p>
   <div class="btn-row">
     <a class="btn" href="https://github.com/francisco-vallesilva/Francisco-Project" target="_blank" rel="noopener">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
       Code
     </a>
-    <a class="btn secondary" href="https://m-selig.ae.illinois.edu/ads/coord_database.html" target="_blank" rel="noopener">UIUC Airfoil Database</a>
+    <a class="btn secondary" href="#video">Video</a>
   </div>
 </header>
 
@@ -406,7 +405,7 @@
   <h2>A faster way to estimate "how will this wing perform?"</h2>
   <p>Designing aircraft wings requires careful optimization, because flight efficiency and performance is heavily reliant on aerodynamics. Because of this, when experimenting with wing shape designs (airfoils), engineers have to test for many variables such as lift coefficients, (C<sub>L</sub>), Angles of Attack (AoA or &alpha;), as well as speeds and altitudes, among many others. In order to get the most accurate results, engineers use a tool called Computational Fluid Dynamics (CFD). However, this simulation software is very time and resource intensive, and engineers usually have to run it thousands of times in order to complete a full design study. With each run taking anywhere from hours to days, it’s really inefficient.</p>
   <p>What if an engineer merely needs to estimate these values while still making sure they’re reliable? That’s exactly what this project explores. While it doesn’t replace CFD’s accuracy, this project’s proposed alternative to CFD takes simulation times down to mere milliseconds, relying on a neural network that learns off of CFD. Using pregenerated airfoil datasets and their aerodynamic coefficients, the deep learning model is able to understand a shape’s underlying mappings and determine aerodynamic coefficients on its own, with decent accuracy. Once well trained, it can do these evaluations nearly instantly, allowing engineers to thoroughly evaluate designs before committing massive time and resources to CFD.</p>
-  <p>This project uses standardized profiles of 2D airfoil shapes from the UIUC Airfoil Database to gather aerodynamic data by running the shapes through a modified XFOIL, an established aerodynamic tool used in engineering, slightly altered to best cohere with this project (it kept getting stuck without modifications, modified code on GitHub). Each airfoil is then saved as a 2D image in a specific format, and along its simulated data, is fed into a ResNet-18 convolutional neural network (CNN) for it to learn off of. The end result is a surrogate model for CFD that’s created off of real data.</p>
+  <p>This project uses standardized profiles of 2D airfoil shapes from the <a href="https://m-selig.ae.illinois.edu/ads/coord_database.html" target="_blank" rel="noopener">UIUC Airfoil Database</a> to gather aerodynamic data by running the shapes through a modified XFOIL, an established aerodynamic tool used in engineering, slightly altered to best cohere with this project (it kept getting stuck without modifications, modified code on GitHub). Each airfoil is then saved as a 2D image in a specific format, and along its simulated data, is fed into a ResNet-18 convolutional neural network (CNN) for it to learn off of. The end result is a surrogate model for CFD that’s created off of real data.</p>
   <p>The motivation for this project is practicality and time-efficiency. Surrogate modeling methods are widely used at institutions such as NASA, and because of the same challenges regarding time and resource-efficient simulation, this project builds a complete pipeline from raw geometry to a trained model from scratch.</p>
 </section>
 
@@ -421,12 +420,8 @@
     <div class="stat b"><div class="num">854</div><div class="lbl">matched image and label pairs</div></div>
     <div class="stat y"><div class="num">5&deg;</div><div class="lbl">angle of attack for training labels</div></div>
   </div>
-</section>
 
-<section class="container narrow" id="airfoil-shapes">
-  <span class="eyebrow b">Airfoil Shapes</span>
-  <h2>Five airfoils, straight from the solver</h2>
-  <p>These are five airfoils from the dataset, rendered exactly as the neural network sees them: black silhouettes rendered from their coordinate files. All five were converged in XFOIL at &alpha; = 5&deg;, so each has real lift data, and each gets its full lift curve, not just the labeled point, as seen below.</p>
+  <p style="margin-top:28px;">These are five airfoils from the dataset, rendered exactly as the neural network sees them: black silhouettes rendered from their coordinate files. All five were converged in XFOIL at &alpha; = 5&deg;, so each has real lift data, and each gets its full lift curve, not just the labeled point, as seen below.</p>
 
   <div class="foil-grid">
     <div class="foil-card c-blue">
@@ -455,6 +450,7 @@
       <div class="foil-meta">C<sub>L</sub> at 5&deg; = 0.8231</div>
     </div>
   </div>
+  <p class="fig-caption" style="text-align:center;font-size:13.5px;color:var(--muted);margin-top:10px;">Five examples out of the 854 airfoils used in training, shown here for illustration.</p>
 
   <p style="margin-top:18px;">This is what XFOIL computes for each of these shapes: a full lift curve, the lift coefficient C<sub>L</sub> at every angle of attack where the viscous solver converged. Every point is an exact solver output row you can hover for values. The dashed vertical line marks &alpha; = 5&deg;, the angle where each airfoil's C<sub>L</sub> becomes its training label, and the sparse stretches along GEMINISM's curve are angles where the solver did not converge (this same result is what cut 1573 airfoils down to 854 usable samples).</p>
 
@@ -486,7 +482,7 @@
 <section class="container narrow" id="model">
   <span class="eyebrow o">Model</span>
   <h2>ResNet-18 as an aerodynamic surrogate</h2>
-  <p>The surrogate is a ResNet-18 convolutional neural network with its classification head replaced by a regression head. The network takes a 224 by 224 rendering of an airfoil as input and outputs a predicted lift coefficient. Framing the problem visually, rather than feeding the network raw coordinates, lets the convolutional layers learn spatial features of the geometry, such as camber, thickness distribution, and leading edge shape, that drive aerodynamic behavior.</p>
+  <p>The surrogate is a ResNet-18 convolutional neural network with its classification head replaced by a regression head. The network takes a 224 by 224 rendering of an airfoil as input and outputs a predicted lift coefficient. The regression head itself is a dropout layer followed by a single linear layer, which takes the backbone's output and maps it to that one number. Framing the problem visually, rather than feeding the network raw coordinates, lets the convolutional layers learn spatial features of the geometry, such as camber, thickness distribution, and leading edge shape, that drive aerodynamic behavior.</p>
   <div class="model-flow" role="img" aria-label="Flow diagram: a 224 by 224 airfoil image passes through the ResNet-18 backbone, then a regression head, and outputs a predicted lift coefficient.">
     <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
       <rect x="8" y="30" width="160" height="90" rx="14" fill="#fff" stroke="#B6D7A8" stroke-width="3"/>
@@ -525,11 +521,6 @@
     </div>
     <div><span class="r2-line">R&sup2; = 0.906 on held out airfoils</span></div>
     <figcaption>The network explains about 91 percent of the variance in solver computed lift using only an image of the geometry, at a per prediction cost of milliseconds. Hover values are read from the plot and rounded to two decimals.</figcaption>
-  </figure>
-  <p style="margin-top:22px;">The training history for the same run shows why the fit holds. Both training and validation error fall steadily and settle without the validation curve turning back upward, so the network is generalizing to unseen airfoils rather than memorizing the training set. This chart along the scatter plot above are what determined run 13's success compared to previous training runs.</p>
-  <figure class="result">
-    <img src="loss_run13.png" alt="Training and validation mean squared error over 50 epochs. Both curves decline and flatten, with validation loss settling near zero and staying below training loss.">
-    <figcaption>Mean squared error over 50 epochs for run 13. The gap between the curves stays small and the validation loss does not diverge, which indicates a stable, well regularized fit.</figcaption>
   </figure>
   <p style="margin-top:22px;">For a screening tool, this is the useful regime: the surrogate ranks candidate geometries reliably enough to narrow a large design space down to a short list, which can then be verified with a full fidelity simulation.</p>
 </section>
@@ -926,7 +917,7 @@
 <section class="container narrow" id="acknowledgments">
   <span class="eyebrow g">Acknowledgments</span>
   <h2>Acknowledgments</h2>
-  <p class="ack">This project was carried out under the mentorship of <a href="https://research.gatech.edu/people/benjamin-joffe" target="_blank" rel="noopener">Benjamin Joffe</a> of the Georgia Tech Research Institute. Airfoil geometries come from the UIUC Airfoil Database, and aerodynamic labels were generated with XFOIL.</p>
+  <p class="ack">This project was carried out under the mentorship of <a href="https://bjoffe.com" target="_blank" rel="noopener">Benjamin Joffe</a> of Georgia Tech. Airfoil geometries come from the UIUC Airfoil Database, and aerodynamic labels were generated with XFOIL.</p>
 </section>
 
 <footer>
