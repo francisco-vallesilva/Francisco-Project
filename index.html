@@ -402,7 +402,7 @@
 
 <section class="container narrow" id="abstract">
   <span class="eyebrow y">Abstract</span>
-  <h2>A faster way to estimate "how will this wing perform?"</h2>
+  <h2>Quickly Estimating Wing Performance</h2>
   <p>Designing aircraft wings requires careful optimization, because flight efficiency and performance is heavily reliant on aerodynamics. Because of this, when experimenting with wing shape designs (airfoils), engineers have to test for many variables such as lift coefficients, (C<sub>L</sub>), Angles of Attack (AoA or &alpha;), as well as speeds and altitudes, among many others. In order to get the most accurate results, engineers use a tool called Computational Fluid Dynamics (CFD). However, this simulation software is very time and resource intensive, and engineers usually have to run it thousands of times in order to complete a full design study. With each run taking anywhere from hours to days, it’s really inefficient.</p>
   <p>What if an engineer merely needs to estimate these values while still making sure they’re reliable? That’s exactly what this project explores. While it doesn’t replace CFD’s accuracy, this project’s proposed alternative to CFD takes simulation times down to mere milliseconds, relying on a neural network that learns off of CFD. Using pregenerated airfoil datasets and their aerodynamic coefficients, the deep learning model is able to understand a shape’s underlying mappings and determine aerodynamic coefficients on its own, with decent accuracy. Once well trained, it can do these evaluations nearly instantly, allowing engineers to thoroughly evaluate designs before committing massive time and resources to CFD.</p>
   <p>This project uses standardized profiles of 2D airfoil shapes from the <a href="https://m-selig.ae.illinois.edu/ads/coord_database.html" target="_blank" rel="noopener">UIUC Airfoil Database</a> to gather aerodynamic data by running the shapes through a modified XFOIL, an established aerodynamic tool used in engineering, slightly altered to best cohere with this project (it kept getting stuck without modifications, modified code on GitHub). Each airfoil is then saved as a 2D image in a specific format, and along its simulated data, is fed into a ResNet-18 convolutional neural network (CNN) for it to learn off of. The end result is a surrogate model for CFD that’s created off of real data.</p>
@@ -411,7 +411,7 @@
 
 <section class="container narrow" id="pipeline">
   <span class="eyebrow g">Data Pipeline</span>
-  <h2>From coordinate files to training pairs</h2>
+  <h2>Getting Training Pairs From Coordinate Files</h2>
   <p><p>It begins with 1573 airfoils from the UIUC Airfoil Database, picked off of the Reynolds number 1e6, which is typically used for small aircraft, gliders, or drones. The airfoils are stored as coordinate files in the Selig format. The airfoils are plotted in a 224x224 px format so they’re usable by the ResNet-18 model, and also run through XFOIL to get datasets for each angle of attack (polars).</p>
   <p>XFOIL’s solver sometimes fails to converge on some geometries, and some converge at too few angles, so not all airfoils are usable. Further filtering the airfoil list to apply to specific angles of attack, 854 samples remained, which is acceptable for working with a real solver’s outputs, because all of those 854 samples have enough data at one angle of attack (5 degrees) to train the model, meaning it’s very scalable.</p>
   <div class="stat-row">
